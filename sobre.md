@@ -1,8 +1,8 @@
 ---
 layout: page
-title: About
-lang: en
+title: Sobre
+lang: pt
 ref: about
 ---
 
-About me
+Sobre mim

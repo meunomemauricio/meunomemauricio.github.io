@@ -1,9 +1,11 @@
 title: Mauricio Freitas
 author: Mauricio Freitas
 email: contato@mauriciofreitas.eng.br
-description: >
-  Simples blog para documentar e compartilhar as pequenas descobertas
-  interessantes de meu dia-a-dia.
+description:
+  pt: >
+    Simples blog para documentar e compartilhar descobertas interessantes.
+  en: >
+    Simple blog to documment and share interesting discoveries.
 baseurl: ""
 url: "https://meunomemauricio.github.io"
 github_username: meunomemauricio
