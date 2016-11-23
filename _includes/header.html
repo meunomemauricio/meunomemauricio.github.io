@@ -2,7 +2,10 @@
   <div class="container">
     <div class="nav-wrapper">
 
-      <a style="font-size: 2em" href="{{ site.baseurl }}/">{{ site.title }}</a>
+      {% assign pages=site.pages | where:"ref", "index" | where:"lang", page.lang %}
+      {% for page in pages %}
+        <a style="font-size: 2em" href="{{ page.url | prepend: site.baseurl }}"> {{ site.title }}</a>
+      {% endfor %}
 
       <ul id="nav-mobile" class="right">
         {% assign pages=site.pages | where:"lang", page.lang %}
