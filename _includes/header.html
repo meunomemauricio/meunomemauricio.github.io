@@ -4,14 +4,14 @@
 
       {% assign pages=site.pages | where:"ref", "index" | where:"lang", page.lang %}
       {% for page in pages %}
-        <a style="font-size: 2em" href="{{ page.url | prepend: site.baseurl }}"> {{ site.title }}</a>
+        <a class="site-title" href="{{ page.url | prepend: site.baseurl }}"> {{ site.title }}</a>
       {% endfor %}
 
       <ul id="nav-mobile" class="right">
         {% assign pages=site.pages | where:"lang", page.lang %}
         {% for page in pages %}
           {% if page.title %}
-          <li><a class="page-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+          <li><a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
           {% endif %}
         {% endfor %}
 
