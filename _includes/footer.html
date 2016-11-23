@@ -30,11 +30,12 @@
       <div class="col l4 m6 offset-l2 s12">
         <h5 class="white-text">Links</h5>
         <ul>
-          <li><a class="grey-text text-lighten-3" href="#!">Home</a></li>
           {% assign pages=site.pages | where:"lang", page.lang %}
           {% for page in pages %}
             {% if page.title %}
-            <li><a class="grey-text text-lighten-3" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+              <li><a class="grey-text text-lighten-3" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+            {% elsif page.ref == "index" %}
+              <li><a class="grey-text text-lighten-3" href="{{ page.url | prepend: site.baseurl }}">Home</a></li>
             {% endif %}
           {% endfor %}
         </ul>
