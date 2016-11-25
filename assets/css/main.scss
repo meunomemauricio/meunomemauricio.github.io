@@ -3,6 +3,8 @@
 
 @import "materialize";
 @import "fontawesome";
+@import "posts";
+
 
 .connect-user {
   margin-left: 5px;
@@ -13,11 +15,6 @@
 
 .site-title {
   font-size: 2em;
-}
-
-.post-header {
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 /* My own "Flow Text"

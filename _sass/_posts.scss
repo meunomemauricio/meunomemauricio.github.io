@@ -1,0 +1,38 @@
+/* The stylesheet for posts formating */
+
+@import url('https://fonts.googleapis.com/css?family=Merriweather:300i,700i|Quattrocento+Sans:400,400i,700,700i|Ubuntu+Mono');
+
+.post-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+article p {
+  font-family: 'Quattrocento Sans', sans-serif;
+  font-weight: 400;
+}
+
+article blockquote p {
+  @extend .grey-text, .text-darken-2;
+  font-family: 'Merriweather', serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+article strong {
+  font-weight: 700;
+}
+
+article blockquote strong {
+  font-weight: 700;
+}
+
+article code {
+  @extend .red-text, .text-lighten-1, .grey, .lighten-4;
+  font-family: 'Ubuntu Mono', monospace;
+  font-weight: 400;
+  padding: 0 3px 0 3px;
+  border: .5px solid #e0e0e0;
+  border-radius: 4px;
+  font-style: normal;
+}
