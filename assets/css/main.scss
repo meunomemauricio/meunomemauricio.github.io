@@ -1,0 +1,24 @@
+---
+---
+
+@import "materialize";
+@import "fontawesome";
+@import "posts";
+@import "index";
+@import "myflowtext";
+
+
+.connect-user {
+  margin-left: 5px;
+  vertical-align: baseline;
+  position: relative;
+  top: -7px;
+}
+
+.site-title {
+  font-size: 2em;
+}
+
+body {
+  background: color("grey", "lighten-4");
+}

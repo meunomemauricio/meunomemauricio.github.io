@@ -1,0 +1,26 @@
+
+.post-meta {
+  border-top: 1px solid color("grey", "lighten-2");
+  border-bottom: 1px solid color("grey", "lighten-2");
+}
+
+.post-meta-date {
+  @extend .grey-text, .text-darken-2;
+  margin: 10px 0 0;
+}
+
+.post-meta-tags {
+  margin: 5px 0 0;
+}
+
+.post-list-item {
+  margin-bottom: 48px;
+}
+
+.post-list-title {
+  color: color("grey", "darken-3");
+}
+
+.post-list-title:hover {
+  color: color("grey", "base");
+}

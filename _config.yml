@@ -9,6 +9,12 @@ description:
 baseurl: ""
 url: "https://meunomemauricio.github.io"
 github_username: meunomemauricio
+languages:
+  pt: Português
+  en: English
 
 # Build settings
 markdown: kramdown
+sass:
+  sass_dir: _sass
+  style: compressed
