@@ -6,6 +6,10 @@ layout: default
     <div class="nav-wrapper">
       <div class="row">
         <div class="col l10 offset-l1 s12 truncate">
+        {% assign pages=site.pages | where:"ref", "index" | where:"lang", page.lang %}
+        {% for page in pages %}
+          <a href="{{ page.url | prepend: site.baseurl }}" class="breadcrumb">Index</a>
+        {% endfor %}
           {% for cat in page.categories %}
             <a href="#!" class="breadcrumb">{{ cat | capitalize }}</a>
           {% endfor %}
