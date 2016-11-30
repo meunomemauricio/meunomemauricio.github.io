@@ -1,6 +1,7 @@
 ---
 layout: tags
-title: <i class="fa fa-tags" aria-hidden="true"></i> Tags
+title: Tags
+icon: fa-tags
 lang: en
 ref: tags
 permalink: /tags/

@@ -8,11 +8,15 @@
         {% assign pages=site.pages | where:"lang", page.lang | where_exp:"item", "item.nav > 0" | sort:"nav" %}
         {% for page in pages %}
           {% if page.title %}
-          <li><a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+          <li><a href="{{ page.url | prepend: site.baseurl }}">
+            <i class="fa fa-fw {{ page.icon }}"></i>
+            {{ page.title }}
+          </a></li>
           {% endif %}
         {% endfor %}
 
         <li><a class="dropdown-button" data-beloworigin="true" href="#!" data-activates="lang-sel-dd">
+          <i class="fa fa-flag fa-fw" aria-hidden="true"></i>
           {{site.languages[page.lang]}}
           <i class="material-icons right">arrow_drop_down</i>
         </a></li>

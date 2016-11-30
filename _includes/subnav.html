@@ -7,7 +7,7 @@
           {% for page in pages %}
             <a href="{{ page.url | prepend: site.baseurl }}" class="breadcrumb">Index</a>
           {% endfor %}
-          <a href="#!" class="breadcrumb">{{ page.title | strip_html | strip }}</a>
+          <a href="#!" class="breadcrumb">{{ page.title }}</a>
         </div>
       </div>
     </div>

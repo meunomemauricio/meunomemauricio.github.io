@@ -1,6 +1,7 @@
 ---
 layout: categories
-title: <i class="fa fa-list" aria-hidden="true"></i> Categorias
+title: Categorias
+icon: fa-list
 lang: pt
 ref: categories
 permalink: /categorias/
