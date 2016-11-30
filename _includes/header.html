@@ -2,9 +2,11 @@
   <div class="container">
     <div class="nav-wrapper">
 
+      <a href="#" id="side-nav-but" data-activates="slide-out" class="button-collapse hide-on-med-and-up"><i class="material-icons">menu</i></a>
+
       <span class="site-title">{{ site.title }}</span>
 
-      <ul id="nav-mobile" class="right">
+      <ul id="nav-mobile" class="right hide-on-small-only">
         {% assign pages=site.pages | where:"lang", page.lang | where_exp:"item", "item.nav > 0" | sort:"nav" %}
         {% for page in pages %}
           {% if page.title %}
@@ -25,6 +27,8 @@
     </div> <!-- nav-wrapper -->
   </div> <!-- container -->
 </nav>
+
+{% include sidenav.html %}
 
 <!-- Dropdown Structure -->
 <ul id="lang-sel-dd" class="dropdown-content">

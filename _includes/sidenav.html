@@ -1,0 +1,41 @@
+<!-- Side Nav Bar-->
+<ul id="slide-out" class="side-nav grey lighten-4">
+  {% assign pages=site.pages | where:"lang", page.lang | sort:"nav" %}
+  {% for page in pages %}
+    {% if page.title %}
+      <li><a href="{{ page.url | prepend: site.baseurl }}" class="waves-effect">
+        <i class="fa fa-fw fa-lg {{ page.icon }}"></i>
+        {{ page.title }}
+      </a></li>
+    {% elsif page.ref == "index" %}
+      <li><a href="{{ page.url | prepend: site.baseurl }}" class="waves-effect"><i class="fa fa-home fa-fw fa-lg" aria-hidden="true"></i> Home</a></li>
+    {% endif %}
+  {% endfor %}
+
+  <li><div class="divider"></div></li>
+
+  <li class="no-padding">
+    <ul class="collapsible collapsible-accordion">
+      <li>
+        <a class="collapsible-header">
+          <i class="fa fa-caret-down"></i>
+          {{ site.languages[page.lang] }}
+          <i class="fa fa-flag fa-fw fa-lg" aria-hidden="true"></i>
+        </a>
+        <div class="collapsible-body">
+          <ul>
+          {% assign posts=site.posts | where:"ref", page.ref | sort: "lang"  %}
+          {% for post in posts %}
+            <li><a href="{{ post.url | prepend: site.baseurl }}">{{site.languages[post.lang]}}</a></li>
+          {% endfor %}
+
+          {% assign pages=site.pages | where:"ref", page.ref | sort: "lang" %}
+          {% for page in pages %}
+            <li><a href="{{ page.url | prepend: site.baseurl }}">{{site.languages[page.lang]}}</a></li>
+          {% endfor %}
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ul>
