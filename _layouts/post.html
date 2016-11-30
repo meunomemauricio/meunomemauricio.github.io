@@ -6,13 +6,16 @@ layout: default
     <div class="nav-wrapper">
       <div class="row">
         <div class="col l10 offset-l1 s12 truncate">
-        {% assign pages=site.pages | where:"ref", "index" | where:"lang", page.lang %}
-        {% for page in pages %}
-          <a href="{{ page.url | prepend: site.baseurl }}" class="breadcrumb">Index</a>
-        {% endfor %}
-          {% for cat in page.categories %}
-            <a href="#!" class="breadcrumb">{{ cat | capitalize }}</a>
+          {% assign pages=site.pages | where:"ref", "index" | where:"lang", page.lang %}
+          {% for page in pages %}
+            <a href="{{ page.url | prepend: site.baseurl }}" class="breadcrumb">Index</a>
           {% endfor %}
+
+          {% assign cat_page=site.pages | where:"ref", "categories" | where:"lang", page.lang | first %}
+          {% for cat in page.categories %}
+            <a href="{{ cat | slugify | prepend:"#" | prepend:cat_page.url }}" class="breadcrumb">{{ cat }}</a>
+          {% endfor %}
+
           <a href="#!" class="breadcrumb">{{ page.date | date: "%b %-d, %Y" }}</a>
           <a href="#!" class="breadcrumb">{{ page.title }}</a>
         </div>
