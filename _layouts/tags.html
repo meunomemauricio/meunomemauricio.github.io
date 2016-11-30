@@ -1,21 +1,7 @@
 ---
 layout: default
 ---
-<nav class="grey darken-2">
-  <div class="container">
-    <div class="nav-wrapper">
-      <div class="row">
-        <div class="col l10 offset-l1 s12 truncate">
-          {% assign pages=site.pages | where:"ref", "index" | where:"lang", page.lang %}
-          {% for page in pages %}
-            <a href="{{ page.url | prepend: site.baseurl }}" class="breadcrumb">Index</a>
-          {% endfor %}
-          <a href="#!" class="breadcrumb">{{ page.title | strip_html | strip }}</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
+{% include subnav.html %}
 
 <div class="container">
   <div class="row">
@@ -25,8 +11,8 @@ layout: default
     {% for entry in tags %}
       {% assign tag = entry | first %}
       {% assign posts = entry | last | where:"lang", page.lang | sort:"date" %}
-      <section id="{{ tag | slugify }}" class="tags-section">
-        <span class="tags-tag">
+      <section id="{{ tag | slugify }}">
+        <span class="lists-title">
           <i class="fa fa-tag" aria-hidden="true"></i>
           {{ tag }} ({{ posts | size }})
         </span>
