@@ -1,0 +1,20 @@
+/* The stylesheet for the Tags page */
+
+.tags-tag {
+  @extend .grey-text, .text-darken-3;
+  font-size: 2em;
+}
+
+section {
+  margin: 5px 0 15px;
+}
+
+section:target {
+  @extend .grey, .lighten-2;
+  border-radius: 10px;
+  padding: 0 10px 1px;
+  margin: 5px 0 15px -10px;
+}
+
+.tags-post {
+}

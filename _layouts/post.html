@@ -28,8 +28,9 @@ layout: default
       <header class="post-header">
         <h3 class="blue-text">{{ page.title }}</h3>
         <div>
+          {% assign tag_page=site.pages | where:"ref", "tags" | where:"lang", page.lang | first %}
           {% for tag in page.tags %}
-            <span class="chip">{{ tag | replace:"_", " " | upcase }}</span>
+            <a href="{{ tag | slugify | prepend:"#" | prepend:tag_page.url  }}" class="chip">{{ tag | upcase }}</a>
           {% endfor %}
         </div>
       </header>
