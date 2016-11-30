@@ -1,0 +1,33 @@
+---
+layout: default
+---
+{% include subnav.html %}
+
+<div class="container">
+  <div class="row">
+    <div class="col l10 offset-l1 s12">
+
+    {% assign categories = site.categories | sort %}
+    {% for entry in categories %}
+      {% assign category = entry | first %}
+      {% assign posts = entry | last | where:"lang", page.lang | sort:"date" %}
+      <section id="{{ category | slugify }}">
+        <span class="lists-title">
+          <i class="fa fa-bookmark" aria-hidden="true"></i>
+          {{ category }} ({{ posts | size }})
+        </span>
+        <ul>
+        {% for post in posts %}
+          <li>
+            <i class="fa fa-caret-right" aria-hidden="true"></i>
+            <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+          </li>
+        {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+
+
+    </div>
+  </div>
+</div>

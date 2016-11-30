@@ -1,0 +1,33 @@
+---
+layout: default
+---
+{% include subnav.html %}
+
+<div class="container">
+  <div class="row">
+    <div class="col l10 offset-l1 s12">
+
+    {% assign tags = site.tags | sort %}
+    {% for entry in tags %}
+      {% assign tag = entry | first %}
+      {% assign posts = entry | last | where:"lang", page.lang | sort:"date" %}
+      <section id="{{ tag | slugify }}">
+        <span class="lists-title">
+          <i class="fa fa-tag" aria-hidden="true"></i>
+          {{ tag }} ({{ posts | size }})
+        </span>
+        <ul>
+        {% for post in posts %}
+          <li>
+            <i class="fa fa-caret-right" aria-hidden="true"></i>
+            <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+          </li>
+        {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+
+
+    </div>
+  </div>
+</div>

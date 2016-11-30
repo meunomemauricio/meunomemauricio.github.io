@@ -5,7 +5,7 @@
       <span class="site-title">{{ site.title }}</span>
 
       <ul id="nav-mobile" class="right">
-        {% assign pages=site.pages | where:"lang", page.lang %}
+        {% assign pages=site.pages | where:"lang", page.lang | where_exp:"item", "item.nav > 0" | sort:"nav" %}
         {% for page in pages %}
           {% if page.title %}
           <li><a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>

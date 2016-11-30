@@ -1,0 +1,22 @@
+/* Stylesheet for Tags and Categories pages */
+
+.lists-title {
+  @extend .grey-text, .text-darken-3;
+  font-size: 1.5em;
+}
+
+section {
+  margin: 15px 0 35px;
+}
+
+section:target {
+  @extend .grey, .lighten-2;
+  border-radius: 5px;
+  padding: 5px 10px 1px;
+  margin: 15px 0 35px -10px;
+  border-bottom: solid 3px color("grey", "lighten-1");
+}
+
+section:last-child {
+  margin: 15px 0 15px;
+}
