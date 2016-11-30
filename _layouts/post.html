@@ -30,7 +30,10 @@ layout: default
         <div>
           {% assign tag_page=site.pages | where:"ref", "tags" | where:"lang", page.lang | first %}
           {% for tag in page.tags %}
-            <a href="{{ tag | slugify | prepend:"#" | prepend:tag_page.url  }}" class="chip">{{ tag | upcase }}</a>
+            <a href="{{ tag | slugify | prepend:"#" | prepend:tag_page.url  }}" class="chip">
+              <i class="fa fa-tag" aria-hidden="true"></i>
+              {{ tag | upcase }}
+            </a>
           {% endfor %}
         </div>
       </header>

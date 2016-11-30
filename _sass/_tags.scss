@@ -2,19 +2,21 @@
 
 .tags-tag {
   @extend .grey-text, .text-darken-3;
-  font-size: 2em;
+  font-size: 1.5em;
 }
 
 section {
-  margin: 5px 0 15px;
+  margin: 15px 0 35px;
 }
 
 section:target {
   @extend .grey, .lighten-2;
-  border-radius: 10px;
-  padding: 0 10px 1px;
-  margin: 5px 0 15px -10px;
+  border-radius: 5px;
+  padding: 5px 10px 1px;
+  margin: 15px 0 35px -10px;
+  border-bottom: solid 3px color("grey", "lighten-1");
 }
 
-.tags-post {
+section:last-child {
+  margin: 15px 0 15px;
 }

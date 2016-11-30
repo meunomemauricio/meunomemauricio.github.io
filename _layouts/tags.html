@@ -26,10 +26,13 @@ layout: default
       {% assign tag = entry | first %}
       {% assign posts = entry | last | where:"lang", page.lang | sort:"date" %}
       <section id="{{ tag | slugify }}" class="tags-section">
-        <span class="tags-tag">{{ tag }} ({{ posts | size }})</span>
+        <span class="tags-tag">
+          <i class="fa fa-tag" aria-hidden="true"></i>
+          {{ tag }} ({{ posts | size }})
+        </span>
         <ul>
         {% for post in posts %}
-          <li class="tags-post">
+          <li>
             <i class="fa fa-caret-right" aria-hidden="true"></i>
             <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
           </li>
