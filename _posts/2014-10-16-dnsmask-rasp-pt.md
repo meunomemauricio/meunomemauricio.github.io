@@ -33,7 +33,7 @@ realizar toda a configuração direto nele, no entanto, recomendo utilizar o
 diretório `/etc/dnsmasq.d` por questão de organização. Para isso, basta retirar
 o comentário na ultima linha do arquivo `/etc/dnsmasc.conf`:
 
-{% highlight conf %}
+{% highlight ini %}
 # Include a another lot of configuration options.
 #conf-file=/etc/dnsmasq.more.conf
 conf-dir=/etc/dnsmasq.d
@@ -52,9 +52,7 @@ O primeiro passo é configurar um nome de domínio. A configuração a ser setad
 é a `domain`. Este domínio ficará acessível apenas localmente e através deste
 servidor DNS.
 
-{% highlight conf %}
-# DNSMasq Configuration
-# Local Domain
+{% highlight ini %}
 domain=raspberry.local
 {% endhighlight %}
 
@@ -63,8 +61,7 @@ Por padrão, o DNSMasq carrega os servidores `nameserver` direto do arquivo
 `no-resolv` para alterar este comportamento e poder configurar os servidores
 externos de DNS manualmente:
 
-{% highlight conf %}
-# External DNS Servers
+{% highlight ini %}
 no-resolv
 server=208.67.222.222
 server=208.67.220.220
@@ -80,8 +77,7 @@ Na sequencia, partimos para configurar o serviço de DHCP. Há a opção
 `dhcp-range` para setar o range de IPs que serão distribuídos entre os clientes
 da rede.
 
-{% highlight conf %}
-# DHCP Settings
+{% highlight ini %}
 dhcp-range=10.0.0.50,10.0.0.59,120m
 dhcp-option=option:router,10.0.0.254
 dhcp-authoritative
@@ -136,10 +132,10 @@ seja necessário realizar Port Forwarding no NAT.
 
 Para fazer isto, basta criar uma entrada do tipo `dhcp-host`, por exemplo:
 
-{% highlight conf %}
-# Fixed IPs
+{% highlight ini %}
 # My Computer
 dhcp-host=AA:BB:CC:DD:EE:FF,mycomputer,10.0.0.1,infinite
+
 # Print Server
 dhcp-host=00:11:22:33:44:55,printer,10.0.0.2,infinite
 {% endhighlight %}

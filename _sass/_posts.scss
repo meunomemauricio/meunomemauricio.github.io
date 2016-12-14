@@ -26,13 +26,3 @@ article strong {
 article blockquote strong {
   font-weight: 700;
 }
-
-article code {
-  @extend .red-text, .text-lighten-1, .grey, .lighten-4;
-  font-family: 'Ubuntu Mono', monospace;
-  font-weight: 400;
-  padding: 0 3px 0 3px;
-  border: .5px solid #e0e0e0;
-  border-radius: 4px;
-  font-style: normal;
-}

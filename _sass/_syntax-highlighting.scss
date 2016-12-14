@@ -1,0 +1,147 @@
+/**
+ * Syntax Highlighting
+ */
+
+// Colors based on the Badwolf VIM Theme: http://stevelosh.com/projects/badwolf
+$plain: #f8f6f2;
+$snow: #ffffff;
+$coal: #000000;
+$brightgravel: #d9cec3;
+$lightgravel: #998f84;
+$gravel: #857f78;
+$mediumgravel: #666462;
+$deepgravel: #45413b;
+$deepergravel: #35322d;
+$darkgravel: #242321;
+$blackgravel: #1c1b1a;
+$blackestgravel: #141413;
+$dalespale: #fade3e;
+$dirtyblonde: #f4cf86;
+$taffy: #ff2c4b;
+$saltwatertaffy: #8cffba;
+$tardis: #0a9dff;
+$orange: #ffa724;
+$lime: #aeee00;
+$dress: #ff9eb8;
+$toffee: #b88853;
+$coffee: #c7915b;
+$darkroast: #88633f;
+
+// Theme
+.highlight {
+  @extend .z-depth-2;
+
+  background: $blackgravel;
+  border-radius: 5px;
+  margin: 0;
+  padding: 10px;
+  font-size: .8em;
+
+  pre {
+    margin: 0;
+  }
+
+  .bp    { color: $lightgravel } // Name.Builtin.Pseudo
+  .c     { color: $gravel; font-style: italic } // Comment
+  .c1    { color: $gravel; font-style: italic } // Comment.Single
+  .cm    { color: $gravel; font-style: italic } // Comment.Multiline
+  .cp    { color: $gravel; font-weight: bold } // Comment.Preproc
+  .cs    { color: $gravel; font-weight: bold; font-style: italic } // Comment.Special
+  .err   { color: $snow; background-color: $taffy } // Error
+  .gd    { color: #000; background-color: #fdd } // Generic.Deleted
+  .gd .x { color: #000; background-color: #faa } // Generic.Deleted.Specific
+  .ge    { font-style: italic } // Generic.Emph
+  .gh    { color: #999 } // Generic.Heading
+  .gi    { color: #000; background-color: #dfd } // Generic.Inserted
+  .gi .x { color: #000; background-color: #afa } // Generic.Inserted.Specific
+  .go    { color: #888 } // Generic.Output
+  .gp    { color: #555 } // Generic.Prompt
+  .gr    { color: $snow } // Generic.Error
+  .gs    { font-weight: bold } // Generic.Strong
+  .gt    { color: #a00 } // Generic.Traceback
+  .gu    { color: #aaa } // Generic.Subheading
+  .il    { color: $toffee } // Literal.Number.Integer.Long
+  .k     { color: $taffy; font-weight: bold } // Keyword
+  .kc    { font-weight: bold } // Keyword.Constant
+  .kd    { font-weight: bold } // Keyword.Declaration
+  .kn    { color: $lime }
+  .kp    { font-weight: bold } // Keyword.Pseudo
+  .kr    { font-weight: bold } // Keyword.Reserved
+  .kt    { color: #458; font-weight: bold } // Keyword.Type
+  .kv    { color: $plain }
+  .m     { color: $toffee } // Literal.Number
+  .mf    { color: $toffee } // Literal.Number.Float
+  .mh    { color: $toffee } // Literal.Number.Hex
+  .mi    { color: $toffee } // Literal.Number.Integer
+  .mo    { color: $toffee } // Literal.Number.Oct
+  .n     { color: $plain } // Name
+  .na    { color: $coffee } // Name.Attribute
+  .nb    { color: $dress } // Name.Builtin
+  .nc    { color: $orange; font-weight: bold } // Name.Class
+  .nd    { color: $lime }
+  .ne    { color: $lime; font-weight: bold } // Name.Exception
+  .nf    { color: $orange; } // Name.Function
+  .ni    { color: #800080 } // Name.Entity
+  .nn    { color: $plain } // Name.Namespace
+  .no    { color: $toffee } // Name.Constant
+  .nt    { color: $darkroast } // Name.Tag
+  .nv    { color: $orange } // Name.Variable
+  .o     { color: $plain; font-weight: bold } // Operator
+  .ow    { color: $taffy; font-weight: bold } // Operator.Word
+  .p     { color: $plain } // Operators
+  .py    { color: $lime }
+  .s     { color: $dirtyblonde } // Literal.String
+  .s1    { color: $dirtyblonde } // Literal.String.Single
+  .s2    { color: $dirtyblonde } // Literal.String.Double
+  .sb    { color: $dirtyblonde } // Literal.String.Backtick
+  .sc    { color: $dirtyblonde } // Literal.String.Char
+  .sd    { color: $dirtyblonde } // Literal.String.Doc
+  .se    { color: $dirtyblonde } // Literal.String.Escape
+  .sh    { color: $dirtyblonde } // Literal.String.Heredoc
+  .si    { color: $dirtyblonde } // Literal.String.Interpol
+  .sr    { color: $dirtyblonde } // Literal.String.Regex
+  .ss    { color: $dirtyblonde } // Literal.String.Symbol
+  .sx    { color: $dirtyblonde } // Literal.String.Other
+  .vc    { color: #008080 } // Name.Variable.Class
+  .vg    { color: #008080 } // Name.Variable.Global
+  .vi    { color: #008080 } // Name.Variable.Instance
+  .w     { color: $gravel } // Text.Whitespace
+}
+
+@media #{$large-and-up} {
+  .highlight {
+    margin: 0 10px 0;
+  }
+}
+
+// Change the "err" style for INI files
+.language-ini{
+  .err {
+    color: $lime;
+    background: $blackgravel;
+  }
+}
+
+// Change the "err" style for Terminal sessions
+.language-terminal {
+ .err {
+    color: $lightgravel;
+    background: $blackgravel;
+  }
+}
+
+// Default text
+code {
+  color: $lightgravel;
+}
+
+// Inline highligther
+code.highlighter-rouge {
+  @extend .red-text, .text-lighten-1, .grey, .lighten-4;
+  font-family: 'Ubuntu Mono', monospace;
+  font-weight: 400;
+  padding: 0 3px 0 3px;
+  border: .5px solid #e0e0e0;
+  border-radius: 4px;
+  font-style: normal;
+}
