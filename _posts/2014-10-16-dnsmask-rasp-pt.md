@@ -10,6 +10,7 @@ tags:
 - Raspberry Pi
 - Networking
 - Linux
+excerpt_separator: <!--more-->
 ---
 
 O [DNSMasq][dnsmasq] é um serviço que combina DNS e DHCP de maneira elegante e
@@ -20,6 +21,11 @@ Devido à esta característica, é muito comum vê-lo sendo utilizado em
 distribuições Linux para roteadores básicos, como é o caso do
 [OpenWrt][openwrt] ou o [DD-WRT][ddwrt]. Pelo mesmo motivo, ele é perfeito para
 ser executado no [Raspberry Pi][rasppi].
+
+Nesse post eu irei demonstrar e explicar uma configuração básica que fiz para
+minha rede de casa.
+
+<!--more-->
 
 O DNSMasq está disponível como um pacote `.deb` para a distribuição
 [Raspbian][raspbian] e portanto pode ser instalado através do apt-get:
