@@ -24,7 +24,7 @@ Github Actions to automatically build multi platform images and pushing them to
 
 <!--more-->
 
-## Running Docker on Raspberry ##
+## Running Docker on Raspberry Pi ##
 
 Docker is an excelent tool for creating and managing containers, greatly
 simplifying the process of setting up a project topology and all its
@@ -34,7 +34,9 @@ In 2016, it was announced at the [Raspberry Pi Blog][rasp-pi-docker] that the
 new `raspbian/jessie` version would count with official support for Docker,
 allowing it to be installed with relatively ease:
 
-    curl -sSL https://get.docker.com | sh
+{% highlight terminal %}
+$ curl -sSL https://get.docker.com | sh
+{% endhighlight %}
 
 Unfortunately, due to the reduced processing power of the Raspberry Pi,
 specially older hardware versions, building a container image is *extremely*

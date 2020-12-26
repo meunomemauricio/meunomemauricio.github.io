@@ -24,7 +24,7 @@ plataformas e disponibilizando elas no [Docker Hub][docker-hub].
 
 <!--more-->
 
-## Docker no Raspberry ##
+## Docker no Raspberry Pi ##
 
 O Docker é uma excelente ferramenta para criação e gerenciamento de containers,
 simplificando muito o processo de setup de uma topologia de um projeto e todas
@@ -34,7 +34,9 @@ Em 2016, foi anunciado no [Blog do Raspberry Pi][rasp-pi-docker] de que a nova
 versão do `raspbian/jessie` contaria com suporte oficial ao Docker, permitindo
 então que este fosse instalado com relativa facilidade:
 
-    curl -sSL https://get.docker.com | sh
+{% highlight terminal %}
+$ curl -sSL https://get.docker.com | sh
+{% endhighlight %}
 
 No entanto, devido à capacidade de processamento do Raspberry Pi, especialmente
 nas versões de hardware mais antigas, o processo de construir as imagens dos
@@ -53,7 +55,7 @@ A solução que encontrei para este problema foi atravéz do comando
 Este commando permite a criação de *builders*, capazes de construirem imagens
 a partir de um `Dockerfile`. Este commando, aliado ao [QEMU][qemu], é capaz de
 [gerar imagens em multiplas plataformas][buildx-repo-multi], incluindo `arm/v6`
-e `arm\v7`, que são as arquiteturas suportadas pelo Raspberry Pi.
+e `arm/v7`, que são as arquiteturas suportadas pelo Raspberry Pi.
 
 Testei este método gerando uma imagem e armazenando ela em um arquivo `.tar`:
 
