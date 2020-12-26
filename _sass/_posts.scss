@@ -12,6 +12,10 @@ article p {
   font-weight: 400;
 }
 
+article h2 {
+  font-size: 2.6rem;
+}
+
 article blockquote p {
   @extend .grey-text, .text-darken-2;
   font-family: 'Merriweather', serif;
