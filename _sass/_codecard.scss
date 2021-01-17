@@ -1,0 +1,27 @@
+
+.codecard {
+  background: $blackgravel;
+  border-radius: 5px;
+  outline: none;
+
+  summary {
+    padding: 6px;
+    color: $taffy;
+  }
+
+  section {
+    margin: 0;
+
+    figure.highlight {
+      margin: 0;
+      box-shadow: none;
+    }
+  }
+}
+
+@media #{$large-and-up} {
+  .codecard {
+    margin: 0 10px 0;
+  }
+}
+

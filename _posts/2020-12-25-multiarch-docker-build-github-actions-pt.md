@@ -124,7 +124,61 @@ A instrução `runs-on` nos permite escolher qual distribuição será utilizada
 
 TBC...
 
-## Referencias ##
+{% capture full_file %}
+  {% highlight yaml %}
+name: Build Docker images
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1.0.1
+        with:
+          platforms: linux/amd64,linux/arm/v6
+
+      - name: Available platforms
+        run: echo {% raw %}${{ steps.qemu.outputs.platforms }}{% endraw %}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.0.4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1.8.0
+        with:
+          username: {% raw %}${{ secrets.DOCKER_HUB_USERNAME }}{% endraw %}
+          password: {% raw %}${{ secrets.DOCKER_HUB_TOKEN }}{% endraw %}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7
+          push: true
+          tags: meunomemauricio/minerva:latest
+
+      - name: Image digest
+        run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
+  {% endhighlight %}
+{% endcapture %}
+
+{% include
+  codecard.html
+  title=".github/workflows/.docker.yml"
+  content=full_file
+%}
+
+## Referências ##
 
 [buildx-repo]: https://github.com/docker/buildx/
 [buildx-repo-multi]: https://github.com/docker/buildx/#building-multi-platform-images
