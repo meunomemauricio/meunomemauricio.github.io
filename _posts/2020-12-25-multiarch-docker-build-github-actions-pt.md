@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title: Construindo Imagens Docker Multi Plataforma através do Github Actions
+title: Construindo Imagens Docker Multi Plataforma através do GitHub Actions
 date: 2020-12-25 23:25:00
 lang: pt
 ref: multiarch-docker-gh-actions
@@ -18,7 +18,7 @@ com tempos de build astronómicos (parei de contar após 20 minutos), muitas
 vezes resultando em erros por incompatibilidade ou indisponibilidade de rede.
 
 Este post apresenta uma solução completa e automatizada para este problema,
-utilizando o Github Actions para automatizar o build das imagens em multiplas
+utilizando o GitHub Actions para automatizar o build das imagens em multiplas
 plataformas e disponibilizando elas no [Docker Hub][docker-hub].
 
 <!--more-->
@@ -56,7 +56,7 @@ a partir de um `Dockerfile`. Este commando, aliado ao [QEMU][qemu], é capaz de
 [gerar imagens em multiplas plataformas][buildx-repo-multi], incluindo `arm/v6`
 e `arm/v7`, que são as arquiteturas suportadas pelo Raspberry Pi.
 
-Testei este método gerando uma imagem e armazenando ela em um arquivo `.tar`:
+Testei este método gerando uma imagem e armazenando ela num arquivo `.tar`:
 
 {% highlight terminal %}
 # Create Builder
@@ -82,14 +82,13 @@ $ docker load -i myproject.tar
 $ docker image tag <SHA digest> myproject:latest
 {% endhighlight %}
 
-## Build automático através do Github Actions ##
+## Build automático através do GitHub Actions ##
 
 O procedimento apresentado até então já é suficiente para cobrir a utilização básica, no entanto, como ele é manual, fica um pouco chato para um desenvolvimento contínuo de um projeto.
 
-Uma maneira de resolver isto é automatizar e incluir este procedimento nas rotinas de Integração Contínua (CI). O [Github Actions][gh-actions] é perfeito para isto, sendo extremamente fácil de configurar e proporcionando uma excelente integração com o repositório do projeto.
+Uma maneira de resolver isto é automatizar e incluir este procedimento nas rotinas de Integração Contínua (CI). O [GitHub Actions][gh-actions] é perfeito para isto, sendo extremamente fácil de configurar e proporcionando uma excelente integração com o repositório do projeto.
 
-O Github Actions nos permite configurar `Workflows`. Estes representam um lista de ações que serão executadas em sequência. Estes são definidos através de arquivos `.yml`. No diretório raiz do repositório, execute:
-
+O GitHub Actions nos permite configurar `Workflows`. Estes representam uma lista de ações que serão executadas em sequência. Estes são definidos através de arquivos `.yml`. No diretório raiz do repositório, execute:
 
 {% highlight terminal %}
 $ mkdir -p .github/workflows
@@ -107,7 +106,7 @@ on:
   workflow_dispatch:
 {% endhighlight %}
 
-Aqui definimos duas condições, `push` e `workflow_dispatch`. A primeira diz que o workflow será executado toda vez que for feito um push no branch `main` (novos projetos no Github são criados com o `main`. Se seu repositório é um pouco mais antigo, é bem provável que este branch seja o `master`). O `workflow_dispatch` nos permitirá executar este Workflow manualmente, através da aba `Actions` na pagina principal do Projeto.
+Aqui definimos duas condições, `push` e `workflow_dispatch`. A primeira diz que o workflow será executado toda vez que houver um push no branch `main` (novos projetos no GitHub são criados com o `main`. Se seu repositório é um pouco mais antigo, é bem provável que este branch seja o `master`). O `workflow_dispatch` nos permitirá executar este Workflow manualmente, através da aba `Actions` na pagina principal do Projeto.
 
 Na sequencia, começamos a definir o procedimento de build:
 
@@ -120,9 +119,69 @@ jobs:
         uses: actions/checkout@v2
 {% endhighlight %}
 
-A instrução `runs-on` nos permite escolher qual distribuição será utilizada para executar nosso Workflow. Optei pelo `ubuntu-18.04` pois é uma versão bem madura e estável. Logo em seguinte, na seção `steps`, começamos definir os passos que serão executados. O primeiro deles é fazer um checkout de nosso repositório na máquina virtual.
+A instrução `runs-on` nos permite escolher qual distribuição será utilizada para executar nosso Workflow. Optei pelo `ubuntu-18.04` pois é uma versão bem madura e estável. Logo em seguinte, na seção `steps`, começamos definir os passos que serão executados. O primeiro deles é fazer um checkout de nosso repositório na máquina virtual (utilizando a ação [`action/checkout`][checkout-action], indicado através da diretiva `uses`).
 
-TBC...
+Para descobrir outras ações, é possível consultar o [GitHub Marketplace][gh-marketplace].
+
+Na sequência, fazemos o setup do QEMU através da ação [docker/setup-qemu-action][setup-qemu]:
+
+{% highlight yaml %}
+      - name: Setup QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1.0.1
+        with:
+          platforms: linux/amd64,linux/arm/v6
+{% endhighlight %}
+
+Aqui específicamos quais as plataformas serão utilizadas. No meu caso, optei por `linux/amd64` e `linux/arm/v6`. Para uma lista completa de plataformas suportadas, consulte o [repositório da ação no GitHub][setup-qemu].
+
+Para ter algum feedback durante a execução do Workflow, crio uma ação utilizando a diretriz [`run`][run-syntax], que permite executar comandos diretamente no shell. Apenas faço um `echo` para imprimir a variável referente ao passo anterior.
+
+{% highlight yaml %}
+      - name: Available platforms
+        run: echo ${{ steps.qemu.outputs.platforms }}
+{% endhighlight %}
+
+Com o QEMU configurado, agora é a vez do `buildx`. Assim como o QEMU, o Docker já disponibiliza [uma ação para isso][setup-buildx]. Basta invocá-la através do `uses`:
+
+{% highlight yaml %}
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.0.4
+{% endhighlight %}
+
+Antes de fazer o build da imagem, é importante fazer o login no Docker Hub. Isso nos permite fazer um *push* da imagem gerada para o repositório da Docker.
+
+Como este arquivo estará commitado no nosso repositório, não podemos simplesmente colocar as nossas credenciais diretamente nele. Isso não deve ser feito, **mesmo que o repositório seja privado**! É muito mais seguro adicionar as credenciais como [Segredos (*Secrets*) no GitHub][gh-secrets] e referenciá-los através de variáveis prefixadas em `secret.`
+
+{% highlight yaml %}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1.8.0
+        with:
+          username: {% raw %}${{ secrets.DOCKER_HUB_USERNAME }}{% endraw %}
+          password: {% raw %}${{ secrets.DOCKER_HUB_TOKEN }}{% endraw %}
+{% endhighlight %}
+
+Finalmente, geramos as imagens através da ação [build-push-action][build-push-action]:
+
+{% highlight yaml %}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64,linux/arm/v6
+          push: true
+          tags: <repo>/<project>:latest
+
+      - name: Image digest
+        run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
+{% endhighlight %}
+
+Mais uma vez, as plataformas são específicadas em `platforms`.
+
+Também é preciso expecificar uma tag a ser aplicada à imagem, através da diretriz `tags`. Utilizo apenas a tag `:latest`, que será sempre sobrescríta. Ainda não explorei muito, mas imagino que seja possível utilizar variáveis para aplicar a mesma tag do repositório Git.
+
+Arquivo completo:
 
 {% capture full_file %}
   {% highlight yaml %}
@@ -163,9 +222,9 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7
+          platforms: linux/amd64,linux/arm/v6
           push: true
-          tags: meunomemauricio/minerva:latest
+          tags: <repo>/<project>:latest
 
       - name: Image digest
         run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
@@ -178,12 +237,18 @@ jobs:
   content=full_file
 %}
 
-## Referências ##
-
-[buildx-repo]: https://github.com/docker/buildx/
+[build-push-action]: https://github.com/docker/build-push-action
 [buildx-repo-multi]: https://github.com/docker/buildx/#building-multi-platform-images
+[buildx-repo]: https://github.com/docker/buildx/
+[checkout-action]: https://github.com/actions/checkout
 [docker-hub]: https://hub.docker.com
+[finding-actions]: https://docs.github.com/pt/actions/learn-github-actions/finding-and-customizing-actions?learn=getting_started&learnProduct=actions
 [gh-actions]: https://github.com/features/actions
+[gh-marketplace]: https://github.com/marketplace?type=actions
+[gh-secrets]: https://docs.github.com/pt/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
 [qemu]: https://www.qemu.org/
 [rasp-pi-docker]: https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/
+[run-syntax]: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+[setup-buildx]: https://github.com/docker/setup-buildx-action
+[setup-qemu]: https://github.com/docker/setup-qemu-action
 
