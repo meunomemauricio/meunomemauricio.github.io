@@ -47,7 +47,7 @@ being cancelled due to a temporary network issue with the NPM repositories.
 
 ## Multi Platform Builds ##
 
-The solution I've found is using the [`buildx`][buildx-repo] command, which is
+The solution I found is using the [`buildx`][buildx-repo] command, which is
 available vie the CLI since version `19.03`.
 
 The command allows the creation of *builders*, capable of building images from
@@ -82,11 +82,17 @@ $ docker image tag <SHA digest> myproject:latest
 
 ## Automatic Builds using GitHub Actions ##
 
-The previous procedure is enough to solve the initial problem, but it's still manual and doesn't fit a continuously developed project.
+The previous procedure is enough to solve the initial problem, but it's 
+still manual and doesn't fit a continuously developed project.
 
-A good way to solve this is by automating it and including it as a Continous Integration (CI) routine. [GitHub Actions][gh-actions] is a very good solution for that, being very easy to configure and integrating seamlessly with GitHub repositories.
+A good way to solve this is by automating it and including it as a 
+Continous Integration (CI) routine. [GitHub Actions][gh-actions] is a very 
+good solution for that, being very easy to configure and integrating 
+seamlessly with the repositories.
 
-GitHub Actions allows us to configure `Workflows`. These are defined through `.yml` files and represent a list of actions to be executed sequentially.
+GitHub Actions allows us to configure `Workflows`. These are defined 
+through `.yml` files and represent a list of actions to be executed 
+sequentially.
 
 In the root of the repository, execute:
 
@@ -95,7 +101,8 @@ $ mkdir -p .github/workflows
 $ touch .github/workflows/docker.yml
 {% endhighlight %}
 
-We start by giving opening this file in a text editor and giving a name to the Workflow and the conditions in which it's supposed to be executed.
+We start by giving opening this file in a text editor and giving a name to 
+the Workflow and the conditions in which it's supposed to be executed.
 
 {% highlight yaml %}
 name: Build Docker images
@@ -106,7 +113,12 @@ on:
   workflow_dispatch:
 {% endhighlight %}
 
-Two conditions two defined, `push` and `workflow_dispatch`. The first indicates that the workflow is going to be executed everytime there's a push to the `main` branch (new GitHub projects are created with `main`. If your repo is older, your default branch is probably `master`). `workflow_dispatch` allow us to execute this Workflow manually, throught he `Actions` tab in the project's main page.
+Two conditions two defined, `push` and `workflow_dispatch`. The first 
+indicates that the workflow is going to be executed everytime there's a 
+push to the `main` branch (new GitHub projects are created with `main`. If 
+your repo is older, your default branch is probably `master`). 
+`workflow_dispatch` allow us to execute this Workflow manually, throught he 
+`Actions` tab in the project's main page.
 
 After that, we start defining the build procedure:
 
@@ -119,9 +131,15 @@ jobs:
         uses: actions/checkout@v2
 {% endhighlight %}
 
-The `runs-on` instruction allow us to choose which type of machine we're executing our Workflow. I've opted for `ubuntu-18.04` since it's very mature and stable. It's followed by the `steps` section, where we define the steps to be executed. The first step is to checkout the repository in the virtual machine (using the [`action/checkout`][checkout-action] action, through the `uses` directive).
+The `runs-on` instruction allow us to choose which type of machine we're 
+executing our Workflow. I've opted for `ubuntu-18.04` since it's very 
+mature and stable. It's followed by the `steps` section, where we define 
+the steps to be executed. The first step is to checkout the repository in 
+the virtual machine (using the [`action/checkout`][checkout-action] action, 
+through the `uses` directive).
 
-To discover other available actions, please take a look at the [GitHub Marketplace][gh-marketplace].
+To discover other available actions, please take a look at the [GitHub 
+Marketplace][gh-marketplace].
 
 Next, we setup QEMU using the [docker/setup-qemu-action][setup-qemu] action:
 
@@ -133,16 +151,21 @@ Next, we setup QEMU using the [docker/setup-qemu-action][setup-qemu] action:
           platforms: linux/amd64,linux/arm/v6
 {% endhighlight %}
 
-Here we specify which platforms are we building for. For a list of available platforms, check the [action repository on GitHub][setup-qemu].
+Here we specify which platforms are we building for. For a list of 
+available platforms, check the [action repository on GitHub][setup-qemu].
 
-So we have some feedback during the workflow execution, I've added an action using the [`run`][run-syntax] directive, which allows us to execute shell commands directly. I use `echo` to print the platforms that were setup in the previous step.
+So we have some feedback during the workflow execution, I've added an 
+action using the [`run`][run-syntax] directive, which allows us to execute 
+shell commands directly. I use `echo` to print the platforms that were 
+setup in the previous step.
 
 {% highlight yaml %}
 - name: Available platforms
 run: echo ${{ steps.qemu.outputs.platforms }}
 {% endhighlight %}
 
-With QEMU configured, now it's time for `buildx`. Just like QEMU, Docker already has an [action for that][setup-buildx]:
+With QEMU configured, now it's time for `buildx`. Just like QEMU, Docker 
+already has an [action for that][setup-buildx]:
 
 {% highlight yaml %}
       - name: Set up Docker Buildx
@@ -150,9 +173,13 @@ With QEMU configured, now it's time for `buildx`. Just like QEMU, Docker already
         uses: docker/setup-buildx-action@v1.0.4
 {% endhighlight %}
 
-Before we build the image, it's important to login to Docker Hub, so we can push images right after they're built.
+Before we build the image, it's important to login to Docker Hub, so we can 
+push images right after they're built.
 
-Since this file is commited to our repository, we can't simply add our credentials in cleartext, **even if the repository is private**. A much more secure alternative is to store credentials using [GitHub Secrets][gh-secrets] and referencing them through variables prefixed with `secret.`:
+Since this file is commited to our repository, we can't simply add our 
+credentials in cleartext, **even if the repository is private**. A much 
+more secure alternative is to store credentials using [GitHub Secrets]
+[gh-secrets] and referencing them through variables prefixed with `secret.`.
 
 {% highlight yaml %}
       - name: Login to Docker Hub
@@ -162,7 +189,8 @@ Since this file is commited to our repository, we can't simply add our credentia
           password: {% raw %}${{ secrets.DOCKER_HUB_TOKEN }}{% endraw %}
 {% endhighlight %}
 
-Finally, we build the images through the [build-push-action][build-push-action] action:
+Finally, we build the images through the [build-push-action]
+[build-push-action] action:
 
 {% highlight yaml %}
       - name: Build and push
@@ -177,7 +205,10 @@ Finally, we build the images through the [build-push-action][build-push-action] 
         run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
 {% endhighlight %}
 
-Here we specify a tag to be applied to the Docker image. For simplicity I'm only using `:latest`, which is always overriden with each new build. I haven't explored this much, but I imagine it should be fairly simple to use the same Git tag through variables.
+Here we specify a tag to be applied to the Docker image. For simplicity, I'm 
+only using `:latest`, which is always overriden with each new build. I 
+haven't explored this much, but I imagine it should be fairly simple to use 
+the same Git tag through variables.
 
 Here is the complete file:
 
