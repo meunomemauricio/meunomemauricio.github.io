@@ -186,7 +186,7 @@ jobs:
 
 * [`docker/setup-buildx-action`][setup-buildx] - Faz o setup do `buildx`.
 
-* [`docker/login-action`] - Fazer o login no Docker Hub:
+* [`docker/login-action`][login-action] - Fazer o login no Docker Hub:
   * Permitirá fazer um _push_ da imagem gerada para o repositório da Docker,
     definido no próximo passo.
   * Como este arquivo estará commitado no nosso repositório, não é uma boa 
@@ -220,6 +220,7 @@ Marketplace] [gh-marketplace].
 [gh-actions]: https://github.com/features/actions
 [gh-marketplace]: https://github.com/marketplace?type=actions
 [gh-secrets]: https://docs.github.com/pt/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
+[login-action]: https://github.com/docker/login-action
 [qemu]: https://www.qemu.org/
 [rasp-pi-docker]: https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/
 [run-syntax]: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstepsrun

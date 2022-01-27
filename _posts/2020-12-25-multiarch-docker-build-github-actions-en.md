@@ -208,6 +208,7 @@ the same Git tag through variables.
 [gh-actions]: https://github.com/features/actions
 [gh-marketplace]: https://github.com/marketplace?type=actions
 [gh-secrets]: https://docs.github.com/pt/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
+[login-action]: https://github.com/docker/login-action
 [qemu]: https://www.qemu.org/
 [rasp-pi-docker]: https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/
 [run-syntax]: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstepsrun
