@@ -92,127 +92,16 @@ seamlessly with the repositories.
 
 GitHub Actions allows us to configure `Workflows`. These are defined 
 through `.yml` files and represent a list of actions to be executed 
-sequentially.
-
-In the root of the repository, execute:
+sequentially. These files should be located in the `.github` directory, in the
+root of the repository:
 
 {% highlight terminal %}
 $ mkdir -p .github/workflows
 $ touch .github/workflows/docker.yml
 {% endhighlight %}
 
-We start by giving opening this file in a text editor and giving a name to 
-the Workflow and the conditions in which it's supposed to be executed.
+This file is defined as:
 
-{% highlight yaml %}
-name: Build Docker images
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-{% endhighlight %}
-
-Two conditions two defined, `push` and `workflow_dispatch`. The first 
-indicates that the workflow is going to be executed everytime there's a 
-push to the `main` branch (new GitHub projects are created with `main`. If 
-your repo is older, your default branch is probably `master`). 
-`workflow_dispatch` allow us to execute this Workflow manually, throught he 
-`Actions` tab in the project's main page.
-
-After that, we start defining the build procedure:
-
-{% highlight yaml %}
-jobs:
-  build:
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-{% endhighlight %}
-
-The `runs-on` instruction allow us to choose which type of machine we're 
-executing our Workflow. I've opted for `ubuntu-18.04` since it's very 
-mature and stable. It's followed by the `steps` section, where we define 
-the steps to be executed. The first step is to checkout the repository in 
-the virtual machine (using the [`action/checkout`][checkout-action] action, 
-through the `uses` directive).
-
-To discover other available actions, please take a look at the [GitHub 
-Marketplace][gh-marketplace].
-
-Next, we setup QEMU using the [docker/setup-qemu-action][setup-qemu] action:
-
-{% highlight yaml %}
-      - name: Setup QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@v1.0.1
-        with:
-          platforms: linux/amd64,linux/arm/v6
-{% endhighlight %}
-
-Here we specify which platforms are we building for. For a list of 
-available platforms, check the [action repository on GitHub][setup-qemu].
-
-So we have some feedback during the workflow execution, I've added an 
-action using the [`run`][run-syntax] directive, which allows us to execute 
-shell commands directly. I use `echo` to print the platforms that were 
-setup in the previous step.
-
-{% highlight yaml %}
-- name: Available platforms
-run: echo ${{ steps.qemu.outputs.platforms }}
-{% endhighlight %}
-
-With QEMU configured, now it's time for `buildx`. Just like QEMU, Docker 
-already has an [action for that][setup-buildx]:
-
-{% highlight yaml %}
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1.0.4
-{% endhighlight %}
-
-Before we build the image, it's important to login to Docker Hub, so we can 
-push images right after they're built.
-
-Since this file is commited to our repository, we can't simply add our 
-credentials in cleartext, **even if the repository is private**. A much 
-more secure alternative is to store credentials using [GitHub Secrets]
-[gh-secrets] and referencing them through variables prefixed with `secret.`.
-
-{% highlight yaml %}
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1.8.0
-        with:
-          username: {% raw %}${{ secrets.DOCKER_HUB_USERNAME }}{% endraw %}
-          password: {% raw %}${{ secrets.DOCKER_HUB_TOKEN }}{% endraw %}
-{% endhighlight %}
-
-Finally, we build the images through the [build-push-action]
-[build-push-action] action:
-
-{% highlight yaml %}
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          platforms: linux/amd64,linux/arm/v6
-          push: true
-          tags: <repo>/<project>:latest
-
-      - name: Image digest
-        run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
-{% endhighlight %}
-
-Here we specify a tag to be applied to the Docker image. For simplicity, I'm 
-only using `:latest`, which is always overriden with each new build. I 
-haven't explored this much, but I imagine it should be fairly simple to use 
-the same Git tag through variables.
-
-Here is the complete file:
-
-{% capture full_file %}
 {% highlight yaml %}
 name: Build Docker images
 
@@ -258,13 +147,57 @@ jobs:
       - name: Image digest
         run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
 {% endhighlight %}
-{% endcapture %}
 
-{% include
-codecard.html
-title=".github/workflows/.docker.yml"
-content=full_file
-%}
+* We start by giving opening this file in a text editor and giving a name to
+the Workflow and the conditions in which it's supposed to be executed.
+
+* Two conditions two defined, `push` and `workflow_dispatch`. The first
+indicates that the workflow is going to be executed everytime there's a
+push to the `main` branch (new GitHub projects are created with `main`. If
+your repo is older, your default branch is probably `master`).
+`workflow_dispatch` allow us to execute this Workflow manually, throught he
+`Actions` tab in the project's main page.
+
+* After that, we start defining the build procedure:
+
+* The `runs-on` instruction allow us to choose which type of machine we're
+executing our Workflow. I've opted for `ubuntu-18.04` since it's very
+mature and stable. It's followed by the `steps` section, where we define
+the steps to be executed. The first step is to checkout the repository in
+the virtual machine (using the [`action/checkout`][checkout-action] action,
+through the `uses` directive).
+
+* To discover other available actions, please take a look at the [GitHub
+Marketplace][gh-marketplace].
+
+* Next, we setup QEMU using the [docker/setup-qemu-action][setup-qemu] action:
+
+* Here we specify which platforms are we building for. For a list of
+available platforms, check the [action repository on GitHub][setup-qemu].
+
+* So we have some feedback during the workflow execution, I've added an
+action using the [`run`][run-syntax] directive, which allows us to execute
+shell commands directly. I use `echo` to print the platforms that were
+setup in the previous step.
+
+* With QEMU configured, now it's time for `buildx`. Just like QEMU, Docker
+already has an [action for that][setup-buildx]:
+
+* Before we build the image, it's important to login to Docker Hub, so we can
+push images right after they're built.
+
+* Since this file is commited to our repository, we can't simply add our
+credentials in cleartext, **even if the repository is private**. A much
+more secure alternative is to store credentials using [GitHub Secrets]
+[gh-secrets] and referencing them through variables prefixed with `secrets.`.
+
+* Finally, we build the images through the [build-push-action]
+[build-push-action] action:
+
+* Here we specify a tag to be applied to the Docker image. For simplicity, I'm
+only using `:latest`, which is always overriden with each new build. I
+haven't explored this much, but I imagine it should be fairly simple to use
+the same Git tag through variables.
 
 [build-push-action]: https://github.com/docker/build-push-action
 [buildx-repo-multi]: https://github.com/docker/buildx/#building-multi-platform-images
