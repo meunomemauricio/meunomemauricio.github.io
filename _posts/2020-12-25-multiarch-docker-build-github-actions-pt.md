@@ -196,7 +196,7 @@ jobs:
     como [Segredos (_Secrets_) no GitHub][gh-secrets] e referenciá-las 
     através de variáveis prefixadas em `secrets.`.
 
-* [build-push-action][build-push-action] - Gera a imagem:
+* [`build-push-action`][build-push-action] - Gera a imagem:
   * Mais uma vez, as plataformas são específicadas em `platforms`.
   * `tags` especifica uma tag a ser aplicada às imagens geradas:
     * Utilizo apenas a tag `:latest`, que será sempre sobrescrita (Ainda não
