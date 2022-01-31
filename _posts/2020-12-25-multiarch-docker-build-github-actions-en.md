@@ -48,7 +48,7 @@ being cancelled due to a temporary network issue with the NPM repositories.
 ## Multi Platform Builds ##
 
 The solution I found is using the [`buildx`][buildx-repo] command, which is
-available vie the CLI since version `19.03`.
+available via the CLI since version `19.03`.
 
 The command allows the creation of *builders*, capable of building images from
 `Dockerfile`s. The command, allied with [QEMU][qemu], is capable of [building
@@ -90,7 +90,7 @@ Continous Integration (CI) routine. [GitHub Actions][gh-actions] is a very
 good solution for that, being very easy to configure and integrating 
 seamlessly with the repositories.
 
-GitHub Actions allows us to configure `Workflows`. These are defined 
+GitHub Actions allows us to configure **Workflows**. These are defined 
 through `.yml` files and represent a list of actions to be executed 
 sequentially. These files should be located in the `.github` directory, in the
 root of the repository:
@@ -123,9 +123,6 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm/v6
 
-      - name: Available platforms
-        run: echo {% raw %}${{ steps.qemu.outputs.platforms }}{% endraw %}
-
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1.0.4
@@ -148,56 +145,62 @@ jobs:
         run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
 {% endhighlight %}
 
-* We start by giving opening this file in a text editor and giving a name to
-the Workflow and the conditions in which it's supposed to be executed.
+* The `name` directive simply gives the workflow a name.
 
-* Two conditions two defined, `push` and `workflow_dispatch`. The first
-indicates that the workflow is going to be executed everytime there's a
-push to the `main` branch (new GitHub projects are created with `main`. If
-your repo is older, your default branch is probably `master`).
-`workflow_dispatch` allow us to execute this Workflow manually, throught he
-`Actions` tab in the project's main page.
+* `on` defines the conditions in which the action will be executed: 
+  * `push` - Defines that the workflow will be executed every time there's 
+    a push to the `main` branch (If it's an older repository, it probably 
+    uses the `master` branch).
+  * `workflow_dispatch` - Allows manual execution of the workflow, in the 
+    `Actions` tab, in the project page.
 
-* After that, we start defining the build procedure:
+* `jobs` defines the jobs to be executed and it's parameters:
+  * `build` - is the name of the job being defined.
+  * `runs-on` - defines the distribution used in the virtual machine that 
+    will execute the action:
+    * I've chosen `ubuntu-18.04`, since it's a mature and stable version, 
+      though I might consider updating it soon.
+  * `steps` - Steps to be executed.
+    * `name` - Step name.
+    * `id` - ID of the step. Allows for it to be referenced in other parts 
+      of the config file.
+    * `uses` - Repository where the action is defined.
+    * `with` - Parameters passed to the action.
 
-* The `runs-on` instruction allow us to choose which type of machine we're
-executing our Workflow. I've opted for `ubuntu-18.04` since it's very
-mature and stable. It's followed by the `steps` section, where we define
-the steps to be executed. The first step is to checkout the repository in
-the virtual machine (using the [`action/checkout`][checkout-action] action,
-through the `uses` directive).
+#### Actions Description
 
+* [`action/checkout`][checkout-action] - Checkouts the repository into the VM.
+
+* [`docker/setup-qemu-action`][setup-qemu] - Setups QEMU:
+  * `platforms` defines the platforms to be configured:
+    * In this case, I've opted for `linux/amd64` and `linux/arm/v6`.
+    * For a complete list of supported platforms, check out 
+      [the action repository][setup-qemu].
+
+* [`docker/setup-buildx-action`][setup-buildx] - Setups `buildx`.
+
+* [`docker/login-action`][login-action] - Login on Docker Hub:
+  * This action will allow pushing the generated image directly to Docker Hub.
+  * Since this config file is commited to the repository, it's not a good 
+    idea to store credentials in plaintext, **even if it's a private 
+    repository**.
+  * To store credentials safely, it's possible to use [GitHub Secrets]
+    [gh-secrets] and reference them through variables prefixed with `secrets.`.
+  
+* [`build-push-action`][build-push-action] - Generates the Docker Image:
+  * Once again, platforms are specified in `platforms`.
+  * `tags` specifies which tag is applied to generated images:
+    * I've chosen only the `:latest` tag, which is overriden every time a 
+      new image is generated.
+    * I haven't explored much yet, but it's probably possible to use 
+      variables to assign the same tag of the commit being processed.
+
+* The `run` directive allows for the execution of a shell command on the VM:
+  * In this case, the `echo` prints the hash of the image generated in the 
+    previous step. It's an example on how to use the IDs to refer to 
+    previous steps (`steps.<step_id>`).
 * To discover other available actions, please take a look at the [GitHub
 Marketplace][gh-marketplace].
-
-* Next, we setup QEMU using the [docker/setup-qemu-action][setup-qemu] action:
-
-* Here we specify which platforms are we building for. For a list of
-available platforms, check the [action repository on GitHub][setup-qemu].
-
-* So we have some feedback during the workflow execution, I've added an
-action using the [`run`][run-syntax] directive, which allows us to execute
-shell commands directly. I use `echo` to print the platforms that were
-setup in the previous step.
-
-* With QEMU configured, now it's time for `buildx`. Just like QEMU, Docker
-already has an [action for that][setup-buildx]:
-
-* Before we build the image, it's important to login to Docker Hub, so we can
-push images right after they're built.
-
-* Since this file is commited to our repository, we can't simply add our
-credentials in cleartext, **even if the repository is private**. A much
-more secure alternative is to store credentials using [GitHub Secrets]
-[gh-secrets] and referencing them through variables prefixed with `secrets.`.
-
-* Finally, we build the images through the [build-push-action]
-[build-push-action] action:
-
-* Here we specify a tag to be applied to the Docker image. For simplicity, I'm
-only using `:latest`, which is always overriden with each new build. I
-haven't explored this much, but I imagine it should be fairly simple to use
-the same Git tag through variables.
 
 [build-push-action]: https://github.com/docker/build-push-action
 [buildx-repo-multi]: https://github.com/docker/buildx/#building-multi-platform-images

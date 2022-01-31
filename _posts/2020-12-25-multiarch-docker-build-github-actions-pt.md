@@ -99,7 +99,7 @@ rotinas de Integração Contínua (CI). O [GitHub Actions][gh-actions] é perfei
 para isto, sendo extremamente fácil de configurar e proporcionando uma
 excelente integração com o repositório do projeto.
 
-O GitHub Actions nos permite configurar `Workflows`. Estes representam uma
+O GitHub Actions nos permite configurar **Workflows**. Estes representam uma
 lista de ações que serão executadas em sequência. Estes são definidos através
 de arquivos `.yml`, definidos no diretório `.github`, na raíz do repositório:
 
@@ -153,9 +153,9 @@ jobs:
         run: echo {% raw %}${{ steps.docker_build.outputs.digest }}{% endraw %}
 {% endhighlight %}
 
-* A primeira diretiva `name` atribui um nome à ação.
+* A primeira diretiva `name` atribui um nome ao Workflow.
 
-* A diretiva `on` define as condições nas quais a ação será executada:
+* A diretiva `on` define as condições nas quais o workflow será executado:
   * `push` - Define que o workflow será executado toda vez que houver push no
     branch `main` (Se o repositório for mais antigo, é bem provável que este
     seja o `master`).
@@ -163,7 +163,7 @@ jobs:
     aba `Actions` na página principal do projeto.
 
 * Diretiva `jobs` define as tarefas a serem executadas e os seus parâmetros:
-  * `build` é o nome do job a ser definido.
+  * `build` - o nome do job a ser definido.
   * `runs-on` - permite escolher qual distribuição será utilizada na 
     máquina virtual (provisionada automaticamente) que executará as ações.
     * Optei pelo `ubuntu-18.04` pois é uma versão bem madura e estável.
@@ -180,9 +180,9 @@ jobs:
 
 * [`docker/setup-qemu-action`][setup-qemu] - Faz o setup do QEMU:
   * `platforms` define as plataformas a serem configuradas no QEMU.
-  * No meu caso, optei por `linux/amd64` e `linux/arm/v6`.
-  * Para uma lista completa de plataformas suportadas, consulte o 
-    [repositório da ação no GitHub][setup-qemu].
+    * No meu caso, optei por `linux/amd64` e `linux/arm/v6`.
+    * Para uma lista completa de plataformas suportadas, consulte o 
+      [repositório da ação no GitHub][setup-qemu].
 
 * [`docker/setup-buildx-action`][setup-buildx] - Faz o setup do `buildx`.
 
