@@ -7,3 +7,7 @@ Install dependencies:
 Update dependencies:
 
     bundle update
+
+Run locally:
+
+    bundle exec jekyll serve
