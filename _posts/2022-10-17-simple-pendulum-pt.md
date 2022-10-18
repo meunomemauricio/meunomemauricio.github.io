@@ -14,13 +14,13 @@ tags:
 - Physics
 ---
 
-A biblioteca [PyMunk](http://www.pymunk.org/en/latest/) é uma engine de
-simulação Física para Python muito interessante! Ela é perfeita para simular
-corpos rígidos em 2D e suas interações, como colisões.
+A biblioteca [PyMunk][pymunk-page] é uma engine de simulação Física para Python
+muito interessante! Ela é perfeita para simular corpos rígidos em 2D e suas
+interações, como colisões.
 
-Neste post irei aliar ela à [pyglet](https://pyglet.org/) (biblioteca para
-criação de jogos e aplicações visuais) para demonstrar como criar a simulação
-de um Pêndulo Simples interativo.
+Neste post irei aliar ela à [pyglet][pyglet-page] (biblioteca para criação de
+jogos e aplicações visuais) para demonstrar como criar a simulação de um
+Pêndulo Simples interativo.
 
 <!--more-->
 
@@ -96,10 +96,10 @@ estes todos são simulados em conjunto, ao longo do tempo.
 Após instanciar o espaço, aproveito e já defino a gravidade utilizada na
 simulação, que é tratada como uma aceleração comum a todos os corpos.
 
-Note que é utilizada uma instância de `Vec2d`. Esta é uma classe da
-própria `pymunk` para representar Vetores 2D, no formato `Vec2d(x, y)`. Neste
-caso, há somente uma componente vertical para esta aceleração, apontando para
-baixo (negativa), com valor de `9807 mm/s²`, equivalente a aceleração da
+Note que é utilizada uma instância de [`Vec2d`][vec2d-ref]. Esta é uma classe
+da própria `pymunk` para representar Vetores 2D, no formato `Vec2d(x, y)`.
+Neste caso, há somente uma componente vertical para esta aceleração, apontando
+para baixo (negativa), com valor de `9807 mm/s²`, equivalente a aceleração da
 gravidade na Terra.
 
 > Vale comentar aqui que a biblioteca `pymunk` **é agnostica em relação a
@@ -111,4 +111,103 @@ gravidade na Terra.
 > Unidades derivadas, como velocidade e aceleração, são calculadas a partir da
 > combinação das outras unidades.
 
-TBC...
+A gravidade foi definida em `mm/s²` já que definiremos posições e distâncias em
+`mm`.
+
+Na sequência iremos construir nosso modelo e definir os corpos e formas que o
+compõem. Começamos por criar uma nova classe:
+
+{% highlight python %}
+class Pendulum:
+    """Fixed Pendulum PyMunk Model."""
+
+    MASS = 0.100  # g
+    ACCELERATION = 100  # mm/s²
+
+    def __init__(self, space: pymunk.Space):
+        self.space = space
+
+        self._create_entities()
+{% endhighlight %}
+
+Definimos as constantes `MASS` e `ACCELERATION` que utilizaremos na sequência e
+no `__init__` recebemos a instância de `Space` utilizada na simulação.
+
+Invocamos o método privado `_create_entities`, onde iremos criar as entidades
+do modelo:
+
+{% highlight python %}
+    def _create_entities(self) -> None:
+        """Create the entities that form the Pendulum."""
+        self.static_body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        self.static_body.position = (360, 360)
+
+        moment = pymunk.moment_for_circle(
+            mass=self.MASS, inner_radius=0, outer_radius=10.0
+        )
+        self.circle_body = pymunk.Body(mass=self.MASS, moment=moment)
+        self.circle_body.position = (360, 50)
+
+        circle_shape = pymunk.Circle(body=self.circle_body, radius=10.0)
+
+        rod_joint = pymunk.constraints.PinJoint(
+            a=self.static_body,
+            b=self.circle_body,
+        )
+
+        self.space.add(
+            self.static_body, self.circle_body, circle_shape, rod_joint
+        )
+{% endhighlight %}
+
+A primeira entidade é chamada `static_body`, ou "corpo estático". Se trata de
+um ponto fixo no espaço, onde iremos fixar nosso pêndulo.
+
+> A classe `pymunk.Body` é um dos conceitos básicos da biblioteca. Ela contêm
+> todas as propriedades físicas do objetos (massa, posição, rotação,
+> velocidade, etc...). No entanto, ela não define uma forma por si só.
+
+Este ponto é definido na posição `(360, 360)`, bem no centro da tela
+(considerando as constantes `WIDTH` e `HEIGHT`, definidas em
+`SimulationWindow`). Para que tenhamos uma simulação em `mm`, podemos assumir
+uma equivalência de 1:1 entre `px` e `mm`.
+
+Na sequência, definimos o corpo para o Círculo que ficará na ponta do pêndulo.
+Antes de instanciar [`pymunk.Body`][body-ref] para ele, é necessário calcular o
+**momento de inercia**, um dos argumentos necessários para se criar um corpo
+dinâmico, através da função `pymunk.moment_for_circle`.
+
+Diferente do corpo estático, não passamos um valor de `body_type` para o
+círculo porque, por padrão, os corpos são criados com o tipo
+`pymunk.Body.DYNAMIC`.
+
+Desta vez, também criamos umas instância da classe `pymunk.Circle`, subclasse
+de [`pymunk.Shape`][shape-ref]. Esta irá criar uma forma de um círculo,
+associado ao corpo que criamos anteriormente.
+
+> A principal utilidade das `Shape`s no PyMunk é realizar cálculo de colisões.
+> Isso não será tão importante para nossa simulação, porém também é utilizada
+> para gerar os gráficos (sprites) que serão utilizados no Pyglet.
+
+E finalmente definimos uma [`pymunk.constraints.PinJoint`][pin-joint-ref] entre
+o `static_body` e o `circle_body`.
+
+> Constraints são entidades utilizadas para **restringir** o
+> movimento/comportamento dos corpos físicos. Existem diversas constraints,
+> cada uma com um comportamento diferente.
+>
+> A `PinJoint`, em específico, mantêm uma distância constante entre 2 objetos,
+> e é utilizada para formar a haste de nosso pêndulo.
+>
+> Para mais informações, [consultar a referência][constraints-ref].
+
+Com todas as entidades criadas, utilizamos `space.add` para adicionar elas ao
+nosso espaço simulado.
+
+[body-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Body
+[constraints-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html
+[pin-joint-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html#pymunk.constraints.PinJoint
+[pyglet-page]: https://pyglet.org/
+[pymunk-page]: http://www.pymunk.org/en/latest/
+[shape-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Shape
+[vec2d-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Vec2d
