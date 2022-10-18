@@ -61,6 +61,11 @@ class SimulationWindow(pyglet.window.Window):
     WIDTH = 720
     HEIGHT = 720
 
+    INTERVAL = 1.0 / 100  # 100 updates / second
+
+    FONT_SIZE = 16
+    FONT_COLOR = (255, 255, 255, 255)
+
     def __init__(self):
         super().__init__(
             width=self.WIDTH, height=self.HEIGHT, caption=self.CAPTION
@@ -119,8 +124,6 @@ compõem. Começamos por criar uma nova classe:
 
 {% highlight python %}
 class Pendulum:
-    """Fixed Pendulum PyMunk Model."""
-
     MASS = 0.100  # g
     ACCELERATION = 100  # mm/s²
 
@@ -138,7 +141,6 @@ do modelo:
 
 {% highlight python %}
     def _create_entities(self) -> None:
-        """Create the entities that form the Pendulum."""
         self.static_body = pymunk.Body(body_type=pymunk.Body.STATIC)
         self.static_body.position = (360, 360)
 
@@ -204,8 +206,82 @@ o `static_body` e o `circle_body`.
 Com todas as entidades criadas, utilizamos `space.add` para adicionar elas ao
 nosso espaço simulado.
 
+Com a classe `Pendulum` definida, podemos continuar com a `SimulationWindow`:
+
+{% highlight python %}
+    def __init__(self):
+        super().__init__(
+            width=self.WIDTH, height=self.HEIGHT, caption=self.CAPTION
+        )
+
+        self.space = pymunk.Space()
+        self.space.gravity = Vec2d(0, -9807)  # mm/s²
+
+        self.model = Pendulum(space=self.space)
+
+        self.draw_options = DrawOptions()
+        self.keyboard = key.KeyStateHandler()
+        self.push_handlers(self.keyboard)
+
+        self.angle_label = pyglet.text.Label(
+            font_size=self.FONT_SIZE,
+            x=5,
+            y=self.height - self.FONT_SIZE - 1,
+            color=self.FONT_COLOR,
+            bold=True,
+        )
+
+        pyglet.clock.schedule_interval(self.update, interval=self.INTERVAL)
+{% endhighlight %}
+
+A biblioteca `pymunk` possui alguns módulos utilitários para facilitar a visualização de suas entidades em outras bibliotecas, como `pygame`, `matplotlib` e, mais relevante ao nosso caso, `pyglet`. No início do programa, importamos a classe [`pymunk.pyglet_util.DrawOptions`][draw-options-ref], que contém instruções de como desenhar o estado atual do espaço, e agora criamos uma instância no `__init__` para utilizarmos depois.
+
+Também criamos uma instância de [`pyglet.window.key.KeyStateHandler`][key-state-ref] e à passamos para o método `self.push_handlers`, que nos permitirá verificar quais teclas estão pressionadas.
+
+Criamos uma [`pyglet.text.Label`][label-ref] que nos permitirá incluir texto na tela. Utilizaremos ela para mostrar o ângulo do pêndulo em tempo real, mais adiante.
+
+E finalmente, utilizamos [`pyglet.clock.schedule_interval`][clock-ref] para que nossa aplicação execute uma função periodicamente, a cada `interval` segundos. É no método `update` que iremos processar as teclas do teclado pressionadas e atualizar o estado de nossa simulação.
+
+Temos todos os elementos necessários instanciados e configurados. Agora iremos tratar de desenhar nossas entidades na tela. Para isso, devemos sobrescrever o método `on_draw`, de `pymunk.window.Window`:
+
+{% highlight python %}
+    def on_draw(self) -> None:
+        self.clear()
+        self.space.debug_draw(options=self.draw_options)
+{% endhighlight %}
+
+O primeiro passo é limpar a tela, com `self.clear()`, e em seguida, utilizamos `debug_draw` de nosso espaço simulado para desenhar as entidades.
+
+E para atualizar o estado de nossa simulação, definimos `update` e chamamos `self.space.step()`:
+
+{% highlight python %}
+    def update(self, dt: float) -> None:
+        self.space.step(dt=self.INTERVAL)
+{% endhighlight %}
+
+A função `step` atualiza nossa simulação, aplicando um passo de tempo `dt`. Utilizamos a mesma constante `INTERVAL`, como maneira de simular as entidades em tempo real.
+
+Caso se deseje fazer a simulação em slow motion, é possível passar frações desse valor para `step` (`self.INTERVAL / 2`, por exemplo). Também é possível multiplicar esse valor para deixar a simulação mais rápida em relação ao tempo real, porém ela perde em precisão.
+
+> É importante notar que o método `update` também recebe um argumento `dt`, que representa quanto tempo foi transcorrido desde a última chamada ao método. Isso se deve ao fato de `schedule_interval` não seguir o valor intervalo *perfeitamente*. Variações na utilização da CPU podem introduzir variações ao intervalo.
+>
+> É bem tentador passar este `dt` diretamente à `step`, como forma de ter uma simulação bem sincronizada com o tempo real. No entanto, **a recomendação da PyMunk é utilizar um intervalo constante em step**. Isto não é um fator tão crucial em nosso caso, porém variabilidades no passo da simulação podem causar comportamentos inesperados, especialmente em relação ao cálculo de colisões.
+
+Nesse momento, podemos executar nossa simulação:
+
+<!-- TODO: stopped_pendulum image -->
+
+O pêndulo está sendo simulado, no entanto nada acontece! Isso ocorre pois ele está em estado de repouso e não há nenhuma força/aceleração sendo aplicada.
+
+TBD...
+
+
 [body-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Body
+[clock-ref]: https://pyglet.readthedocs.io/en/latest/modules/clock.html#pyglet.clock.Clock.schedule_interval_soft
 [constraints-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html
+[draw-options-ref]: http://www.pymunk.org/en/latest/pymunk.pyglet_util.html
+[key-state-ref]: https://pyglet.readthedocs.io/en/latest/modules/window_key.html#pyglet.window.key.KeyStateHandler
+[label-ref]: https://pyglet.readthedocs.io/en/latest/modules/text/index.html#pyglet.text.Label
 [pin-joint-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html#pymunk.constraints.PinJoint
 [pyglet-page]: https://pyglet.org/
 [pymunk-page]: http://www.pymunk.org/en/latest/
