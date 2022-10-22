@@ -222,22 +222,12 @@ Com a classe `Pendulum` definida, podemos continuar com a `SimulationWindow`:
         self.keyboard = key.KeyStateHandler()
         self.push_handlers(self.keyboard)
 
-        self.angle_label = pyglet.text.Label(
-            font_size=self.FONT_SIZE,
-            x=5,
-            y=self.height - self.FONT_SIZE - 1,
-            color=self.FONT_COLOR,
-            bold=True,
-        )
-
         pyglet.clock.schedule_interval(self.update, interval=self.INTERVAL)
 {% endhighlight %}
 
 A biblioteca `pymunk` possui alguns módulos utilitários para facilitar a visualização de suas entidades em outras bibliotecas, como `pygame`, `matplotlib` e, mais relevante ao nosso caso, `pyglet`. No início do programa, importamos a classe [`pymunk.pyglet_util.DrawOptions`][draw-options-ref], que contém instruções de como desenhar o estado atual do espaço, e agora criamos uma instância no `__init__` para utilizarmos depois.
 
 Também criamos uma instância de [`pyglet.window.key.KeyStateHandler`][key-state-ref] e à passamos para o método `self.push_handlers`, que nos permitirá verificar quais teclas estão pressionadas.
-
-Criamos uma [`pyglet.text.Label`][label-ref] que nos permitirá incluir texto na tela. Utilizaremos ela para mostrar o ângulo do pêndulo em tempo real, mais adiante.
 
 E finalmente, utilizamos [`pyglet.clock.schedule_interval`][clock-ref] para que nossa aplicação execute uma função periodicamente, a cada `interval` segundos. É no método `update` que iremos processar as teclas do teclado pressionadas e atualizar o estado de nossa simulação.
 
@@ -296,16 +286,45 @@ Chamo este vetor de `impulse`, ou impulso, pois trata-se de uma **força instant
 * `apply_force_at_local_point`
 * `apply_impulse_at_local_point`
 
-O método `apply_force_` aplica uma força constante, que continuará afetando o corpo até que esta seja cessada. Já o `apply_impulse_`, aplica esta força de maneira instantânea, alterando a velocidade e direção do corpo apenas no próximo `step`.
+O método `apply_force_` aplica uma força constante, que continuará afetando o corpo até que esta seja cessada, como por exemplo um motor de um carro. Já o `apply_impulse_`, aplica esta força de maneira instantânea, alterando a velocidade e direção do corpo apenas no próximo `step`, como um projétil sendo atirado de um canhão, por exemplo.
 
-Há também os métodos `apply_force_at_world_point` e `apply_impulse_at_world_point`. A diferença para `local_point` é a maneira como são processadas as coordenadas de referência do vetor força em relação ao objeto.
+Há também os métodos `apply_force_at_world_point` e `apply_impulse_at_world_point`. A diferença é a maneira como são processadas as coordenadas de referência do vetor força em relação ao objeto. No caso de `local_point`, as forças são aplicadas como se tivessem sendo geradas a partir do próprio objeto, como por exemplo um sistema de propulsão. Já `world_point`, é como se as forças fossem originadas externamente.
+
+Com `accelerate` definido, a ideia é permitir aplicar esta força ao pêndulo de acordo com o que for pressionado no teclado:
+
+{% highlight python %}
+    def _handle_input(self):
+        if self.keyboard[key.LEFT]:
+            direction = self.model.vector.rotated_degrees(-90)  # CW
+            self.model.accelerate(direction=direction)
+        elif self.keyboard[key.RIGHT]:
+            direction = self.model.vector.rotated_degrees(90)  # CCW
+            self.model.accelerate(direction=direction)
+
+    def update(self, dt: float) -> None:
+        self._handle_input()
+        self.space.step(dt=self.INTERVAL)
+{% endhighlight %}
+
+Para isto, crio o método `_handle_input`, que será chamado no método `update`, antes de atualizar o estado da simulação.
+
+`self.keyboard` é uma instância de `KeyStateHandler`, que após ser passado como argumento de `self.push_handlers`, funciona como um dicionário indicando quais teclas estão pressionadas naquele instante. Utilizamos este atributo para verificar se as teclas Direita (*right*) ou Esquerda (*left*) estão selecionadas e aceleramos o pêndulo caso estejam.
+
+A ideia é aplicar uma força no sentido horário, qdo a tecla esquerda é pressionada, e anti-horário, qdo a direita é pressionada. Como o circulo do pêndulo segue uma trajetória circular, é preciso fazer com que a direção da força aplicada seja sempre perpendicular ao vetor do pêndulo, como mostra o diagrama a seguir:
+
+<!-- TODO: Force diagram. -->
+
+Para realizar isto, acessamos o vetor através de `self.model.vector` e chamamos o método `rotated_degress()` para rotacionar ele em -90 ou 90 graus, dependendo do sentido. Não há de se preocupar com o módulo deste vetor, pois ele é normalizado na função `accelerate`.
+
+Com isso, nossa simulação está completa. É possível fazer o pêndulo se mover:
+
+<!-- TODO: Gif of the pendulum. -->
 
 [body-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Body
 [clock-ref]: https://pyglet.readthedocs.io/en/latest/modules/clock.html#pyglet.clock.Clock.schedule_interval_soft
 [constraints-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html
 [draw-options-ref]: http://www.pymunk.org/en/latest/pymunk.pyglet_util.html
 [key-state-ref]: https://pyglet.readthedocs.io/en/latest/modules/window_key.html#pyglet.window.key.KeyStateHandler
-[label-ref]: https://pyglet.readthedocs.io/en/latest/modules/text/index.html#pyglet.text.Label
 [pin-joint-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html#pymunk.constraints.PinJoint
 [pyglet-page]: https://pyglet.org/
 [pymunk-page]: http://www.pymunk.org/en/latest/
