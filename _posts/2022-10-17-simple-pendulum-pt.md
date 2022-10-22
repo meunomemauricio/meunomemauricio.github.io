@@ -125,7 +125,7 @@ compõem. Começamos por criar uma nova classe:
 {% highlight python %}
 class Pendulum:
     MASS = 0.100  # g
-    ACCELERATION = 100  # mm/s²
+    FORCE = 10  # mN
 
     def __init__(self, space: pymunk.Space):
         self.space = space
@@ -133,8 +133,7 @@ class Pendulum:
         self._create_entities()
 {% endhighlight %}
 
-Definimos as constantes `MASS` e `ACCELERATION` que utilizaremos na sequência e
-no `__init__` recebemos a instância de `Space` utilizada na simulação.
+Definimos as constantes `MASS` e `FORCE` que utilizaremos na sequência e no `__init__` recebemos a instância de `Space` utilizada na simulação.
 
 Invocamos o método privado `_create_entities`, onde iremos criar as entidades
 do modelo:
@@ -273,8 +272,33 @@ Nesse momento, podemos executar nossa simulação:
 
 O pêndulo está sendo simulado, no entanto nada acontece! Isso ocorre pois ele está em estado de repouso e não há nenhuma força/aceleração sendo aplicada.
 
-TBD...
+Para tornar esta simulação dinâmica, devemos extender nossa classe `Pendulum`:
 
+{% highlight python %}
+    @property
+    def vector(self) -> Vec2d:
+        """Pendulum Vector, from Fixed point to the center of the Circle."""
+        return self.circle_body.position - self.static_body.position
+
+    def accelerate(self, direction: Vec2d):
+        """Apply force in the direction `dir`."""
+        impulse = self.FORCE * direction.normalized()
+        self.circle_body.apply_impulse_at_local_point(impulse=impulse)
+{% endhighlight %}
+
+A propriedade `vector` é o vetor que representará o pêndulo, com origem no ponto estático e apontando ao centro do círculo. Os objetos da classe `Body` possuem o atributo `position` que é um `Vec2d`, que já suporta operações entre vetores, então basta subtrair a posição do `static_body` da posição do `circle_body`.
+
+O método `accelerate` aplicará uma força ao círculo do pêndulo. Recebemos um argumento `direction` para determinal a direção da força que será aplicada.
+
+A constante `FORCE` é uma grandeza escalar. Para transforma-la em um vetor, normalizamos o vetor direção, como forma de garantir que ele terá módulo `1`, e então multiplicamos pela constante.
+
+Chamo este vetor de `impulse`, ou impulso, pois trata-se de uma **força instantânea**. Esta é uma distinção importante para a `pymunk`, já que esta possui dois métodos principais de aplicar uma força a um corpo:
+* `apply_force_at_local_point`
+* `apply_impulse_at_local_point`
+
+O método `apply_force_` aplica uma força constante, que continuará afetando o corpo até que esta seja cessada. Já o `apply_impulse_`, aplica esta força de maneira instantânea, alterando a velocidade e direção do corpo apenas no próximo `step`.
+
+Há também os métodos `apply_force_at_world_point` e `apply_impulse_at_world_point`. A diferença para `local_point` é a maneira como são processadas as coordenadas de referência do vetor força em relação ao objeto.
 
 [body-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Body
 [clock-ref]: https://pyglet.readthedocs.io/en/latest/modules/clock.html#pyglet.clock.Clock.schedule_interval_soft
