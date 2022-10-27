@@ -79,7 +79,13 @@ if __name__ == "__main__":
 
 Executar este módulo deve abrir uma nova janela vazia:
 
-<!-- TODO: Add fixed_pendulum/empty_window.jpg -->
+<img
+  class="responsive-img"
+  src="https://raw.githubusercontent.com/meunomemauricio/meunomemauricio.github.io/master/assets/images/fixed_pendulum/empty_screen.png"
+  alt="Empty pyglet screen."
+  width=500
+  height=500
+/>
 
 Na sequência, expando o `__init__` para criar uma nova instância da classe
 `pymunk.Space`.
@@ -258,7 +264,13 @@ Caso se deseje fazer a simulação em slow motion, é possível passar frações
 
 Nesse momento, podemos executar nossa simulação:
 
-<!-- TODO: stopped_pendulum image -->
+<img
+  class="responsive-img"
+  src="https://raw.githubusercontent.com/meunomemauricio/meunomemauricio.github.io/master/assets/images/fixed_pendulum/stopped_pendulum.png"
+  alt="Empty pyglet screen."
+  width=500
+  height=500
+/>
 
 O pêndulo está sendo simulado, no entanto nada acontece! Isso ocorre pois ele está em estado de repouso e não há nenhuma força/aceleração sendo aplicada.
 
@@ -312,13 +324,27 @@ Para isto, crio o método `_handle_input`, que será chamado no método `update`
 
 A ideia é aplicar uma força no sentido horário, qdo a tecla esquerda é pressionada, e anti-horário, qdo a direita é pressionada. Como o circulo do pêndulo segue uma trajetória circular, é preciso fazer com que a direção da força aplicada seja sempre perpendicular ao vetor do pêndulo, como mostra o diagrama a seguir:
 
-<!-- TODO: Force diagram. -->
+<img
+  class="responsive-img"
+  style="margin-top: 30px; margin-bottom: 30px;"
+  src="https://raw.githubusercontent.com/meunomemauricio/meunomemauricio.github.io/master/assets/images/fixed_pendulum/force_diagram.svg"
+  alt="Dynamic pendulum animation."
+  width=180
+  height=180
+/>
 
 Para realizar isto, acessamos o vetor através de `self.model.vector` e chamamos o método `rotated_degress()` para rotacionar ele em -90 ou 90 graus, dependendo do sentido. Não há de se preocupar com o módulo deste vetor, pois ele é normalizado na função `accelerate`.
 
 Com isso, nossa simulação está completa. É possível fazer o pêndulo se mover:
 
-<!-- TODO: Gif of the pendulum. -->
+<img
+  class="responsive-img"
+  src="https://raw.githubusercontent.com/meunomemauricio/meunomemauricio.github.io/master/assets/images/fixed_pendulum/animation.png"
+  alt="Dynamic pendulum animation."
+  width=320
+  height=320
+/>
+
 
 [body-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Body
 [clock-ref]: https://pyglet.readthedocs.io/en/latest/modules/clock.html#pyglet.clock.Clock.schedule_interval_soft
