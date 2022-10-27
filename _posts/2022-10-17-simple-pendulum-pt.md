@@ -345,11 +345,17 @@ Com isso, nossa simulação está completa. É possível fazer o pêndulo se mov
   height=320
 />
 
+O código completo desta simulação [está disponível neste GIST][gist]:
+
+<div class="gistcontainer">
+  <script src="https://gist.github.com/meunomemauricio/edd85dbb4a37d563fc3cefac07935524.js"></script>
+</div>
 
 [body-ref]: http://www.pymunk.org/en/latest/pymunk.html#pymunk.Body
 [clock-ref]: https://pyglet.readthedocs.io/en/latest/modules/clock.html#pyglet.clock.Clock.schedule_interval_soft
 [constraints-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html
 [draw-options-ref]: http://www.pymunk.org/en/latest/pymunk.pyglet_util.html
+[gist]: https://gist.github.com/meunomemauricio/edd85dbb4a37d563fc3cefac07935524
 [key-state-ref]: https://pyglet.readthedocs.io/en/latest/modules/window_key.html#pyglet.window.key.KeyStateHandler
 [pin-joint-ref]: http://www.pymunk.org/en/latest/pymunk.constraints.html#pymunk.constraints.PinJoint
 [pyglet-page]: https://pyglet.org/
