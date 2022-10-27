@@ -24,8 +24,7 @@ Pêndulo Simples interativo.
 
 <!--more-->
 
-O primeiro passo é instalar as dependências. Para isso, crio um novo ambiente
-virtual (estou utilizando a versão **3.10.8** do Python):
+O primeiro passo é instalar as dependências. Para isso, criamos um novo ambiente virtual (estou utilizando a versão **3.10.8** do Python):
 
 {% highlight terminal %}
 $ python -m venv venv --prompt pendulum
@@ -34,8 +33,7 @@ $ source venv/bin/activate
 (pendulum)$ pip install pyglet==1.5.27 pymunk==6.2.1
 {% endhighlight %}
 
-Irei criar um modulo chamado `simple_pendulum.py` e começarei importando as
-bibliotecas:
+Iremos criar um modulo chamado `simple_pendulum.py` e começar por importar as bibliotecas:
 
 {% highlight python %}
 import pymunk
@@ -46,13 +44,9 @@ from pymunk import Vec2d
 from pymunk.pyglet_util import DrawOptions
 {% endhighlight %}
 
-Como base mínima deste programa, irei declarar uma nova classe que herda de
-`pyglet.window.Window` e executá-la como uma app do Pyglet.
+Como base mínima deste programa, iremos declarar uma nova classe que herda de `pyglet.window.Window` e executá-la como uma app do Pyglet.
 
-A classe `Window` aceita alguns argumentos para ajustar parâmetros da tela.
-Como utilizarei parâmetros fixos neste exemplo, sobrescrevo o `__init__` e
-invoco o `__init__` do `super()`, passando estes parâmetros que vêm dos
-atributos de classe.
+A classe `Window` aceita alguns argumentos para ajustar parâmetros da tela. Como utilizaremos parâmetros fixos neste exemplo, sobrescrevemos o `__init__` e invocamos o `__init__` do `super()`, passando estes parâmetros que vêm dos atributos de classe.
 
 {% highlight python %}
 class SimulationWindow(pyglet.window.Window):
@@ -87,8 +81,7 @@ Executar este módulo deve abrir uma nova janela vazia:
   height=500
 />
 
-Na sequência, expando o `__init__` para criar uma nova instância da classe
-`pymunk.Space`.
+Na sequência, expandimos o `__init__` para criar uma nova instância da classe `pymunk.Space`.
 
 {% highlight python %}
     def __init__(self):
@@ -100,18 +93,11 @@ Na sequência, expando o `__init__` para criar uma nova instância da classe
         self.space.gravity = Vec2d(0, -9807)  # mm/s²
 {% endhighlight %}
 
-O Espaços são a unidade básica de simulação. Os corpos (*bodies*), formas
-(*shapes*) e junções (*joints* ou *constraints*) são adicionados ao espaço e
-estes todos são simulados em conjunto, ao longo do tempo.
+O Espaços são a unidade básica de simulação. Os corpos (*bodies*), formas (*shapes*) e junções (*joints* ou *constraints*) são adicionados ao espaço e estes todos são simulados em conjunto, ao longo do tempo.
 
-Após instanciar o espaço, aproveito e já defino a gravidade utilizada na
-simulação, que é tratada como uma aceleração comum a todos os corpos.
+Após instanciar o espaço, aproveitamos e já definimos a gravidade utilizada na simulação, que é tratada como uma aceleração comum a todos os corpos.
 
-Note que é utilizada uma instância de [`Vec2d`][vec2d-ref]. Esta é uma classe
-da própria `pymunk` para representar Vetores 2D, no formato `Vec2d(x, y)`.
-Neste caso, há somente uma componente vertical para esta aceleração, apontando
-para baixo (negativa), com valor de `9807 mm/s²`, equivalente a aceleração da
-gravidade na Terra.
+Note que é utilizada uma instância de [`Vec2d`][vec2d-ref]. Esta é uma classe da própria `pymunk` para representar Vetores 2D, no formato `Vec2d(x, y)`. Neste caso, há somente uma componente vertical para esta aceleração, apontando para baixo (negativa), com valor de `9807 mm/s²`, equivalente a aceleração da gravidade na Terra.
 
 > Vale comentar aqui que a biblioteca `pymunk` **é agnostica em relação a
 > unidades físicas**! Não interessa para ela qual unidade está utilizando em
