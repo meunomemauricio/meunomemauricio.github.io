@@ -42,3 +42,15 @@ article ul {
 article li {
   list-style-type: circle !important;
 }
+
+article img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+article div.gistcontainer {
+  margin: 0 30px 30px 30px;
+  max-height: 300px;
+  overflow: auto;
+}
