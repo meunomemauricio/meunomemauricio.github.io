@@ -14,17 +14,13 @@ tags:
 - Physics
 ---
 
-A biblioteca [PyMunk][pymunk-page] é uma engine de simulação Física para Python
-muito interessante! Ela é perfeita para simular corpos rígidos em 2D e suas
-interações, como colisões.
+The [PyMunk][pymunk-page] library is a very interesting physics simulation engine! It's perfect to simulate. It's perfect to simulate rigid bodies and its interactions, like colisions, in a 2D environment.
 
-Neste post irei aliar ela à [pyglet][pyglet-page] (biblioteca para criação de
-jogos e aplicações visuais) para demonstrar como criar a simulação de um
-Pêndulo Simples interativo.
+In this post, I'm going to combine it with [pyglet][pyglet-page] (games and visual application library) for a demonstration on how to simulate an interactive Simple Pendulum.
 
 <!--more-->
 
-O primeiro passo é instalar as dependências. Para isso, criamos um novo ambiente virtual (estou utilizando a versão **3.10.8** do Python):
+The first step is to install dependencies. We start by creating a new virtual environment (I'm using Python version **3.10.8**):
 
 {% highlight terminal %}
 $ python -m venv venv --prompt pendulum
@@ -33,7 +29,7 @@ $ source venv/bin/activate
 (pendulum)$ pip install pyglet==1.5.27 pymunk==6.2.1
 {% endhighlight %}
 
-Iremos criar um modulo chamado `simple_pendulum.py` e começar por importar as bibliotecas:
+Then we create a module called `simple_pendulum.py` and start by importing the libraries:
 
 {% highlight python %}
 import pymunk
@@ -44,9 +40,9 @@ from pymunk import Vec2d
 from pymunk.pyglet_util import DrawOptions
 {% endhighlight %}
 
-Como base mínima deste programa, iremos declarar uma nova classe que herda de `pyglet.window.Window` e executá-la como uma app do Pyglet.
+Laying the initial foundation, we declare a new class that inherits from `pyglet.window.Window` and we run it as a Pyglet app.
 
-A classe `Window` aceita alguns argumentos para ajustar parâmetros da tela. Como utilizaremos parâmetros fixos neste exemplo, sobrescrevemos o `__init__` e invocamos o `__init__` do `super()`, passando estes parâmetros que vêm dos atributos de classe.
+The `Window` class accepts certain arguments to adjust the screen parameters. Since we'll use constant parameters in this example, we can override `__init__` and call `super().__init__()`, passing the class attributes:
 
 {% highlight python %}
 class SimulationWindow(pyglet.window.Window):
@@ -71,7 +67,7 @@ if __name__ == "__main__":
     pyglet.app.run()
 {% endhighlight %}
 
-Executar este módulo deve abrir uma nova janela vazia:
+Running this module should spawn a new empty screen:
 
 <img
   class="responsive-img"
@@ -81,7 +77,7 @@ Executar este módulo deve abrir uma nova janela vazia:
   height=500
 />
 
-Na sequência, expandimos o `__init__` para criar uma nova instância da classe `pymunk.Space`.
+Next, we expand `__init__` in order to create an instance of `pymunk.Space`:
 
 {% highlight python %}
     def __init__(self):
@@ -93,26 +89,24 @@ Na sequência, expandimos o `__init__` para criar uma nova instância da classe 
         self.space.gravity = Vec2d(0, -9807)  # mm/s²
 {% endhighlight %}
 
-O Espaços são a unidade básica de simulação. Os corpos (*bodies*), formas (*shapes*) e junções (*joints* ou *constraints*) são adicionados ao espaço e estes todos são simulados em conjunto, ao longo do tempo.
+*Spaces* are the basic unit of simulation. *Bodies*, *Shapes* and *Constraints*(Joints) are added to the space and they're all simulated together, throughout time.
 
-Após instanciar o espaço, aproveitamos e já definimos a gravidade utilizada na simulação, que é tratada como uma aceleração comum a todos os corpos.
+After creating the `Space` instance, we already define the gravity value, which is implemented as a constant acceleration applied to all defined bodies.
 
-Note que é utilizada uma instância de [`Vec2d`][vec2d-ref]. Esta é uma classe da própria `pymunk` para representar Vetores 2D, no formato `Vec2d(x, y)`. Neste caso, há somente uma componente vertical para esta aceleração, apontando para baixo (negativa), com valor de `9807 mm/s²`, equivalente a aceleração da gravidade na Terra.
+Notice that it's defined as an instance of [`Vec2d`][vec2d-ref]. This is a `pymunk` class to represent 2D vectors. In this case, there's only a vertical acceleration component, pointing down (negative y), with value `9807 mm/s²`, equivalent to Earth's gravity.
 
-> Vale comentar aqui que a biblioteca `pymunk` **é agnostica em relação a
-> unidades físicas**! Não interessa para ela qual unidade está utilizando em
-> suas medidas; Se passar um valor em `s` para uma função que espera tempo e um
-> valor em `mm` para uma função de distância ou posição, então todos os
-> cálculos serão feitos nestas unidades.
+> It's worth mentioning that `pymunk` is **unit-less**, meaning it's agnostic
+> to physical units. It doesn't matter which units are being used; If a value
+> is passed in `s` to a function that expects time and another value is passed
+> in `mm` to a function that expects distance or position, then all the
+> calculations will be in those units.
 >
-> Unidades derivadas, como velocidade e aceleração, são calculadas a partir da
-> combinação das outras unidades.
+> Derived units, like velocity and acceleration, are calculated as combinations
+> of those units.
 
-A gravidade foi definida em `mm/s²` já que definiremos posições e distâncias em
-`mm`.
+The gravity was defined in `mm/s²` since distances and positions will be defined in `mm`.
 
-Na sequência iremos construir nosso modelo e definir os corpos e formas que o
-compõem. Começamos por criar uma nova classe:
+Next, we'll build our model and define its bodies and shapes. Let's start by creating a new class:
 
 {% highlight python %}
 class Pendulum:
@@ -125,10 +119,7 @@ class Pendulum:
         self._create_entities()
 {% endhighlight %}
 
-Definimos as constantes `MASS` e `FORCE` que utilizaremos na sequência e no `__init__` recebemos a instância de `Space` utilizada na simulação.
-
-Invocamos o método privado `_create_entities`, onde iremos criar as entidades
-do modelo:
+The `MASS` and `FORCE` attributes are constants we'll use later. We receive the `space` instance in `__init__` and we call `_create_entities`, where we'll create bodies, shapes and junctions:
 
 {% highlight python %}
     def _create_entities(self) -> None:
@@ -153,26 +144,18 @@ do modelo:
         )
 {% endhighlight %}
 
-A primeira entidade é chamada `static_body`, ou "corpo estático". Se trata de
-um ponto fixo no espaço, onde iremos fixar nosso pêndulo.
+The first entity is called `static_body`. It's a static (immovable) point in the space, where we'll attach our pendulum.
 
-> A classe `pymunk.Body` é um dos conceitos básicos da biblioteca. Ela contêm
-> todas as propriedades físicas do objetos (massa, posição, rotação,
-> velocidade, etc...). No entanto, ela não define uma forma por si só.
+> The `pymunk.Body` class is one of the library's basic concepts. It contains
+> all the physical properties representing the body (mass, position, rotation,
+> velocity, etc...). It doesn't define the shape of the object on its own,
+> though.
 
-Este ponto é definido na posição `(360, 360)`, bem no centro da tela
-(considerando as constantes `WIDTH` e `HEIGHT`, definidas em
-`SimulationWindow`). Para que tenhamos uma simulação em `mm`, podemos assumir
-uma equivalência de 1:1 entre `px` e `mm`.
+This point is defined at position `(360, 360)`, right in the center of the screen (considering `WIDTH` and `HEIGHT` constants). To have a simulation in `mm`, we can simply assume a 1:1 relation between `px` and `mm`.
 
-Na sequência, definimos o corpo para o Círculo que ficará na ponta do pêndulo.
-Antes de instanciar [`pymunk.Body`][body-ref] para ele, é necessário calcular o
-**momento de inercia**, um dos argumentos necessários para se criar um corpo
-dinâmico, através da função `pymunk.moment_for_circle`.
+Next, we'll define the body for the Circle that will be at the end of the pendulum. Before creating a [`pymunk.Body`][body-ref] instance, it's necessary to calculate the **moment of inertia**, one of the required arguments to create a Dynamic body, via the `pymunk.moment_for_circle` function.
 
-Diferente do corpo estático, não passamos um valor de `body_type` para o
-círculo porque, por padrão, os corpos são criados com o tipo
-`pymunk.Body.DYNAMIC`.
+Different than static bodies, we don't need to specify `body_type` for the Circle, since new bodies are created with `pymunk.Body.DYNAMIC`, by default.
 
 Desta vez, também criamos umas instância da classe `pymunk.Circle`, subclasse
 de [`pymunk.Shape`][shape-ref]. Esta irá criar uma forma de um círculo,

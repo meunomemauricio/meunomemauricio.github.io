@@ -76,7 +76,7 @@ Executar este módulo deve abrir uma nova janela vazia:
 <img
   class="responsive-img"
   src="https://raw.githubusercontent.com/meunomemauricio/meunomemauricio.github.io/master/assets/images/fixed_pendulum/empty_screen.png"
-  alt="Empty pyglet screen."
+  alt="Janela do pyglet vazia."
   width=500
   height=500
 />
