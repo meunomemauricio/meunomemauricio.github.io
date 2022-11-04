@@ -157,30 +157,21 @@ Next, we'll define the body for the Circle that will be at the end of the pendul
 
 Different than static bodies, we don't need to specify `body_type` for the Circle, since new bodies are created with `pymunk.Body.DYNAMIC`, by default.
 
-Desta vez, também criamos umas instância da classe `pymunk.Circle`, subclasse
-de [`pymunk.Shape`][shape-ref]. Esta irá criar uma forma de um círculo,
-associado ao corpo que criamos anteriormente.
+This time we also create an instance of `pymunk.Circle`, a [`pymunk.Shape`][shape-ref] subclass. This will create a Circle shape and associate it to the previous body.
 
-> A principal utilidade das `Shape`s no PyMunk é realizar cálculo de colisões.
-> Isso não será tão importante para nossa simulação, porém também é utilizada
-> para gerar os gráficos (sprites) que serão utilizados no Pyglet.
+> The main purpose of `Shape`s in PyMunk is to calculate collisions. While this is not crucial for this particular simulation, the shape is also automatically rendered in Pyglet by the util function.
 
-E finalmente definimos uma [`pymunk.constraints.PinJoint`][pin-joint-ref] entre
-o `static_body` e o `circle_body`.
+Finally, we define a [`pymunk.constraints.PinJoint`][pin-joint-ref] between `static_body` and `circle_body`.
 
-> Constraints são entidades utilizadas para **restringir** o
-> movimento/comportamento dos corpos físicos. Existem diversas constraints,
-> cada uma com um comportamento diferente.
+> Constraints are entities that **restrict** the movement of certain bodies. There are many different constraints, which with a different purpose and behaviour.
 >
-> A `PinJoint`, em específico, mantêm uma distância constante entre 2 objetos,
-> e é utilizada para formar a haste de nosso pêndulo.
+> The `PinJoint`, in particular, keeps a constant distance between two bodies and is used to form the shaft of our pendulum.
 >
-> Para mais informações, [consultar a referência][constraints-ref].
+> For more information, [there's the reference page][constraints-ref].
 
-Com todas as entidades criadas, utilizamos `space.add` para adicionar elas ao
-nosso espaço simulado.
+Having created all entities, we use `space.add` to add them to our simulated space.
 
-Com a classe `Pendulum` definida, podemos continuar com a `SimulationWindow`:
+With the `Pendulum` class defined, we can continue with `SimulationWindow`:
 
 {% highlight python %}
     def __init__(self):
@@ -200,13 +191,13 @@ Com a classe `Pendulum` definida, podemos continuar com a `SimulationWindow`:
         pyglet.clock.schedule_interval(self.update, interval=self.INTERVAL)
 {% endhighlight %}
 
-A biblioteca `pymunk` possui alguns módulos utilitários para facilitar a visualização de suas entidades em outras bibliotecas, como `pygame`, `matplotlib` e, mais relevante ao nosso caso, `pyglet`. No início do programa, importamos a classe [`pymunk.pyglet_util.DrawOptions`][draw-options-ref], que contém instruções de como desenhar o estado atual do espaço, e agora criamos uma instância no `__init__` para utilizarmos depois.
+The `pymunk` library has a couple of modules to help visualizing its entities in other libraries, like `pygame`, `matplotlib` and, more relevant to our case, `pyglet`. In the beginning of the module, the class [`pymunk.pyglet_util.DrawOptions`][draw-options-ref], which has instructions on how to draw the current state of the space on screen, was imported. Now we instantiate it in `__init__` to use it later.
 
-Também criamos uma instância de [`pyglet.window.key.KeyStateHandler`][key-state-ref] e à passamos para o método `self.push_handlers`, que nos permitirá verificar quais teclas estão pressionadas.
+We also create an instance of [`pyglet.window.key.KeyStateHandler`][key-state-ref] and pass it to `self.push_handlers`, which will allow us to verify which keys are being pressed at any time.
 
-E finalmente, utilizamos [`pyglet.clock.schedule_interval`][clock-ref] para que nossa aplicação execute uma função periodicamente, a cada `interval` segundos. É no método `update` que iremos processar as teclas do teclado pressionadas e atualizar o estado de nossa simulação.
+Finally, we use [`pyglet.clock.schedule_interval`][clock-ref] to execute the `update` method periodically, every `interval` seconds. It's in this method that we'll process keyboard input and update our simulation state.
 
-Temos todos os elementos necessários instanciados e configurados. Agora iremos tratar de desenhar nossas entidades na tela. Para isso, devemos sobrescrever o método `on_draw`, de `pymunk.window.Window`:
+With all elements instantiated and configured, now we'll draw all the entities in the screen. For that, we override the `on_draw` method, from `pymunk.window.Window`:
 
 {% highlight python %}
     def on_draw(self) -> None:
@@ -214,24 +205,24 @@ Temos todos os elementos necessários instanciados e configurados. Agora iremos 
         self.space.debug_draw(options=self.draw_options)
 {% endhighlight %}
 
-O primeiro passo é limpar a tela, com `self.clear()`, e em seguida, utilizamos `debug_draw` de nosso espaço simulado para desenhar as entidades.
+The first step is to clean the screen with `self.clear()` and then call `debug_draw` from our simulated space.
 
-E para atualizar o estado de nossa simulação, definimos `update` e chamamos `self.space.step()`:
+In `update`, we call `self.space.step()` to update its state:
 
 {% highlight python %}
     def update(self, dt: float) -> None:
         self.space.step(dt=self.INTERVAL)
 {% endhighlight %}
 
-A função `step` atualiza nossa simulação, aplicando um passo de tempo `dt`. Utilizamos a mesma constante `INTERVAL`, como maneira de simular as entidades em tempo real.
+The `step` function accepts an argument `dt`, which is the time delta for the simulation. We use the same `INTERVAL` constant as a way to keep the simulation in real time.
 
-Caso se deseje fazer a simulação em slow motion, é possível passar frações desse valor para `step` (`self.INTERVAL / 2`, por exemplo). Também é possível multiplicar esse valor para deixar a simulação mais rápida em relação ao tempo real, porém ela perde em precisão.
+If we wanted to make a slow motion simulation, we could pass a fraction of `INTERVAL` to `step` (e.g. `self.INTERVAL / 2`). It's also possible to multiply this value to make it faster than real time, but the simulation will lose precision.
 
-> É importante notar que o método `update` também recebe um argumento `dt`, que representa quanto tempo foi transcorrido desde a última chamada ao método. Isso se deve ao fato de `schedule_interval` não seguir o valor intervalo *perfeitamente*. Variações na utilização da CPU podem introduzir variações ao intervalo.
+> It's important to note that `update` also receives a `dt` argument, which represents how much time passed since the last invocation. This happens because `schedule_interval` doesn't follow the given interval *perfectly*. Any varation in CPU usage can cause fluctuations to the interval.
 >
-> É bem tentador passar este `dt` diretamente à `step`, como forma de ter uma simulação bem sincronizada com o tempo real. No entanto, **a recomendação da PyMunk é utilizar um intervalo constante em step**. Isto não é um fator tão crucial em nosso caso, porém variabilidades no passo da simulação podem causar comportamentos inesperados, especialmente em relação ao cálculo de colisões.
+> While it's very tempting to use the `df` from `update` directly in `step`, as a way to make the simulation completely synchronized with real time, the practice is very discouraged! The **PyMunk recomendation is to use a fixed time step**. Variations to the simulation step can cause unexpected behaviour, specially in regards to collision calculation.
 
-Nesse momento, podemos executar nossa simulação:
+Currently, it's already possible to execute the simulation:
 
 <img
   class="responsive-img"
@@ -241,9 +232,9 @@ Nesse momento, podemos executar nossa simulação:
   height=500
 />
 
-O pêndulo está sendo simulado, no entanto nada acontece! Isso ocorre pois ele está em estado de repouso e não há nenhuma força/aceleração sendo aplicada.
+But nothing is happening! This happens because the pendulum is in a complete steady state, since there are no forces other than gravity being applied.
 
-Para tornar esta simulação dinâmica, devemos extender nossa classe `Pendulum`:
+To make the simulation dynamic, we extend the `Pendulum` class:
 
 {% highlight python %}
     @property
@@ -257,21 +248,21 @@ Para tornar esta simulação dinâmica, devemos extender nossa classe `Pendulum`
         self.circle_body.apply_impulse_at_local_point(impulse=impulse)
 {% endhighlight %}
 
-A propriedade `vector` é o vetor que representará o pêndulo, com origem no ponto estático e apontando ao centro do círculo. Os objetos da classe `Body` possuem o atributo `position` que é um `Vec2d`, que já suporta operações entre vetores, então basta subtrair a posição do `static_body` da posição do `circle_body`.
+The `vector` property will represent the pendulum itself, starting from the static point and pointing to the center of the circle. Objects of the `Body` class have the `position` attribute, which is a `Vec2d`, so subtracting the position of `static_body` from `circle_body` will generate the pendulum vector.
 
-O método `accelerate` aplicará uma força ao círculo do pêndulo. Recebemos um argumento `direction` para determinal a direção da força que será aplicada.
+The `accelerate` method will apply a force to the circle of our pendulum. It receives the `direction` argument, which determines the direction of the force that is going to be applied.
 
-A constante `FORCE` é uma grandeza escalar. Para transforma-la em um vetor, normalizamos o vetor direção, como forma de garantir que ele terá módulo `1`, e então multiplicamos pela constante.
+The `FORCE` constant is a scalar magnitude. To make it a vector, we normalize the `direction` vector (preserving its direction while forcing it to have a magnitude of `1`), and then we multiply it by the constant.
 
-Chamo este vetor de `impulse`, ou impulso, pois trata-se de uma **força instantânea**. Esta é uma distinção importante para a `pymunk`, já que esta possui dois métodos principais de aplicar uma força a um corpo:
+This vector is called `impulse` because it's representing an **instantaneous force**. This is an important distinction for `pymunk`, which has 2 methods to apply a force to a body:
 * `apply_force_at_local_point`
 * `apply_impulse_at_local_point`
 
-O método `apply_force_` aplica uma força constante, que continuará afetando o corpo até que esta seja cessada, como por exemplo um motor de um carro. Já o `apply_impulse_`, aplica esta força de maneira instantânea, alterando a velocidade e direção do corpo apenas no próximo `step`, como um projétil sendo atirado de um canhão, por exemplo.
+`apply_force_` applies a *constant* force, meaning it will continue to affect the body until it's ceased. As an example, this could represent a vehicle engine. `apply_impulse_` applies an *instantaneous* force, only altering the velocity and direction of the body in the next simulation step. This is a behaviour similar to a projectile being fired from a cannon, for example.
 
-Há também os métodos `apply_force_at_world_point` e `apply_impulse_at_world_point`. A diferença é a maneira como são processadas as coordenadas de referência do vetor força em relação ao objeto. No caso de `local_point`, as forças são aplicadas como se tivessem sendo geradas a partir do próprio objeto, como por exemplo um sistema de propulsão. Já `world_point`, é como se as forças fossem originadas externamente.
+There's also the methods `apply_force_at_world_point` and `apply_impulse_at_world_point`. The difference is how the force coordinates are processed in relation to the object. `local_point` applies forces like they're being generated from the own object, like a propulsion system. `world_point` is used when the forces are being generated externally.
 
-Com `accelerate` definido, a ideia é permitir aplicar esta força ao pêndulo de acordo com o que for pressionado no teclado:
+With `accelerate` defined, the idea is to apply forces to the pendulum based on the keyboard input:
 
 {% highlight python %}
     def _handle_input(self):
@@ -287,11 +278,11 @@ Com `accelerate` definido, a ideia é permitir aplicar esta força ao pêndulo d
         self.space.step(dt=self.INTERVAL)
 {% endhighlight %}
 
-Para isto, crio o método `_handle_input`, que será chamado no método `update`, antes de atualizar o estado da simulação.
+The `_handle_input` method is called from `update`, right before updating the simulation.
 
-`self.keyboard` é uma instância de `KeyStateHandler`, que após ser passado como argumento de `self.push_handlers`, funciona como um dicionário indicando quais teclas estão pressionadas naquele instante. Utilizamos este atributo para verificar se as teclas Direita (*right*) ou Esquerda (*left*) estão selecionadas e aceleramos o pêndulo caso estejam.
+`self.keyboard` is an instance of `KeyStateHandler`, which works as a dictionary, indicating which keys are being pressed at that moment.
 
-A ideia é aplicar uma força no sentido horário, qdo a tecla esquerda é pressionada, e anti-horário, qdo a direita é pressionada. Como o circulo do pêndulo segue uma trajetória circular, é preciso fazer com que a direção da força aplicada seja sempre perpendicular ao vetor do pêndulo, como mostra o diagrama a seguir:
+This attribute is used to apply a *Clockwise* force when left is pressed and a *Counter clockwise* force when right is pressed. Since the pendulum has a circular trajectory, it's necessary to make the applied forces always perpendicular to the pendulum vector, like illustrated in this diagram:
 
 <img
   class="responsive-img"
@@ -302,9 +293,9 @@ A ideia é aplicar uma força no sentido horário, qdo a tecla esquerda é press
   height=180
 />
 
-Para realizar isto, acessamos o vetor através de `self.model.vector` e chamamos o método `rotated_degress()` para rotacionar ele em -90 ou 90 graus, dependendo do sentido. Não há de se preocupar com o módulo deste vetor, pois ele é normalizado na função `accelerate`.
+This is done by taking `self.model.vector` and calling the `rotated_degrees` method, rotating it by `-90` or `90` degrees, depending on the key being pressed. We don't need to worry about the length of the vector, since it will be normalized inside `accelerate`.
 
-Com isso, nossa simulação está completa. É possível fazer o pêndulo se mover:
+Now our simulation is complete! It's possible to make our pendulum move using the keyboard:
 
 <img
   class="responsive-img"
@@ -314,7 +305,7 @@ Com isso, nossa simulação está completa. É possível fazer o pêndulo se mov
   height=320
 />
 
-O código completo desta simulação [está disponível neste GIST][gist]:
+The complete code for this simulation [can be found in this GIST][gist]
 
 <div class="gistcontainer">
   <script src="https://gist.github.com/meunomemauricio/edd85dbb4a37d563fc3cefac07935524.js"></script>
