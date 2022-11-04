@@ -76,7 +76,7 @@ Executar este módulo deve abrir uma nova janela vazia:
 <img
   class="responsive-img"
   src="https://raw.githubusercontent.com/meunomemauricio/meunomemauricio.github.io/master/assets/images/fixed_pendulum/empty_screen.png"
-  alt="Empty pyglet screen."
+  alt="Janela do pyglet vazia."
   width=500
   height=500
 />
@@ -174,7 +174,7 @@ Diferente do corpo estático, não passamos um valor de `body_type` para o
 círculo porque, por padrão, os corpos são criados com o tipo
 `pymunk.Body.DYNAMIC`.
 
-Desta vez, também criamos umas instância da classe `pymunk.Circle`, subclasse
+Desta vez, também criamos uma instância da classe `pymunk.Circle`, subclasse
 de [`pymunk.Shape`][shape-ref]. Esta irá criar uma forma de um círculo,
 associado ao corpo que criamos anteriormente.
 
@@ -240,7 +240,7 @@ E para atualizar o estado de nossa simulação, definimos `update` e chamamos `s
         self.space.step(dt=self.INTERVAL)
 {% endhighlight %}
 
-A função `step` atualiza nossa simulação, aplicando um passo de tempo `dt`. Utilizamos a mesma constante `INTERVAL`, como maneira de simular as entidades em tempo real.
+A função `step` atualiza nossa simulação, aplicando um passo de tempo `dt`. Utilizamos a mesma constante `INTERVAL` como maneira de simular as entidades em tempo real.
 
 Caso se deseje fazer a simulação em slow motion, é possível passar frações desse valor para `step` (`self.INTERVAL / 2`, por exemplo). Também é possível multiplicar esse valor para deixar a simulação mais rápida em relação ao tempo real, porém ela perde em precisão.
 
@@ -276,7 +276,7 @@ Para tornar esta simulação dinâmica, devemos extender nossa classe `Pendulum`
 
 A propriedade `vector` é o vetor que representará o pêndulo, com origem no ponto estático e apontando ao centro do círculo. Os objetos da classe `Body` possuem o atributo `position` que é um `Vec2d`, que já suporta operações entre vetores, então basta subtrair a posição do `static_body` da posição do `circle_body`.
 
-O método `accelerate` aplicará uma força ao círculo do pêndulo. Recebemos um argumento `direction` para determinal a direção da força que será aplicada.
+O método `accelerate` aplicará uma força ao círculo do pêndulo. Recebemos um argumento `direction` para determinar a direção da força que será aplicada.
 
 A constante `FORCE` é uma grandeza escalar. Para transforma-la em um vetor, normalizamos o vetor direção, como forma de garantir que ele terá módulo `1`, e então multiplicamos pela constante.
 
